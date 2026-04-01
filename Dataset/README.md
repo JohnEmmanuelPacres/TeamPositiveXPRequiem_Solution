@@ -1,70 +1,67 @@
 # STAR Data Generator
 
-This script generates synthetic teacher profile data to simulate the **STAR Certification** ecosystem. It is designed to model regional disparities, specifically highlighting "High Fragility" in areas like BARMM and Region VIII where subject-major mismatches are more frequent.
+This script generates synthetic teacher profile data to simulate the STAR Certification ecosystem. It models regional disparities, specifically highlighting "High Fragility" in areas like BARMM and Region VIII where subject-major mismatches are more frequent.
 
----
+## Project Setup
 
-## Quick Start
+### 1. Create a Virtual Environment
 
-### 1. Initialize Virtual Environment
+It is recommended to use a virtual environment to manage dependencies:
 
-To keep your dependencies isolated, activate the provided virtual environment:
+```powershell
+python -m venv .venv
+```
 
-**For PowerShell:**
+### 2. Activate the Environment
+
+Activate the environment based on your terminal:
+
+**PowerShell:**
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-**For Command Prompt (CMD):**
+**Command Prompt (CMD):**
 
 ```cmd
 .\.venv\Scripts\activate
 ```
 
-### 2. Install Requirements
+### 3. Install Dependencies
 
-Ensure `pandas` and `numpy` are installed within your active environment:
+Install the required packages using the requirements file:
 
 ```powershell
-pip install pandas numpy
+pip install -r Dataset/requirements.txt
 ```
 
-### 3. Run the Generator
+## Running the Script
 
-Execute the script to produce the synthetic dataset:
+Execute the generator to produce the dataset. The script will check for a `Dataset` folder and create one if it is missing.
 
 ```powershell
 python Dataset/generate_star_data.py
 ```
 
----
+## Data Logic and Archetypes
 
-## Data Logic & Archetypes
-
-The script generates **3,500 records** using specific logic to simulate real-world educational challenges:
+The script generates 3,500 records using the following logic:
 
 | Feature | Logic |
 | :--- | :--- |
 | **High Fragility Regions** | BARMM and Region VIII (Lower experience, 70% subject mismatch rate). |
 | **Established Regions** | NCR, Region VII, etc. (Higher experience, 80% subject alignment). |
-| **Certification Level** | Automatically set to **Level 1** if experience is < 5 years or if a subject mismatch is detected. |
-| **Fragility Indicator** | Flagged as **High** whenever `Major_Specialization` does not match `Subject_Taught`. |
+| **Certification Level** | Set to Level 1 if experience is < 5 years or if a subject mismatch is detected. |
+| **Fragility Indicator** | Flagged as High whenever Major_Specialization does not match Subject_Taught. |
 
----
+## Output and Versioning
 
-## Output
-
-Files are saved in the `Dataset/` folder with a unique timestamp to prevent overwriting:
+Files are saved in the `Dataset/Data` folder. The script uses a timestamp-based naming convention to prevent overwriting existing data.
 
 * **Format:** `STAR_Integrated_Data_YYYYMMDD_HHMM.csv`
-* **Schema-Healer Ready:** The data is generated to test the robust integration of educational metadata.
 
----
-
-## Maintenance
-
-To exit the environment after your work is done, simply run:
+To exit the virtual environment, run:
 
 ```powershell
 deactivate
