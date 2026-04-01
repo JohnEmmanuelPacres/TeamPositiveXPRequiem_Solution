@@ -1,0 +1,41 @@
+TeamPositiveXPRequiem_Solution/
+│
+├── Dataset/                     # Your teammate's existing folder (DO NOT TOUCH)
+│   └── Data/
+│       └── STAR_Integrated_Data_20260401_2324.csv 
+│
+├── core/                        # Shared global utilities
+│   ├── __init__.py
+│   ├── data_loader.py           # Loads the CSV and INJECTS the Lat/Lng coordinates
+│   ├── auth.py                  # Manages Streamlit session_state (Admin vs. Teacher roles)
+│   └── ui_components.py         # Shared styling (custom CSS, standardized headers)
+│
+├── modules/                     # The 4 Core Pillars of the Application
+│   ├── __init__.py
+│   │
+│   ├── geospatial_tracker/      # Pillar 1: The Project NOAH Logistics Map
+│   │   ├── __init__.py
+│   │   ├── map_engine.py        # PyDeck configuration (3D heatmaps, ArcLayers)
+│   │   ├── routing.py           # Logic to find the nearest available teacher by skillset
+│   │   └── view.py              # The full-screen UI for the map
+│   │
+│   ├── ingestion/               # Pillar 2: The Data Integration Engine
+│   │   ├── __init__.py
+│   │   ├── schema_healer.py     # Uses 'thefuzz' and 're' to normalize messy column headers
+│   │   └── view.py              # UI for the "drag-and-drop" file cleaner
+│   │
+│   ├── network_dashboard/       # Pillar 3: The Obsidian Neural Map
+│   │   ├── __init__.py
+│   │   ├── graph_builder.py     # Uses 'NetworkX' to model hubs (schools) and nodes (teachers)
+│   │   ├── simulator.py         # The logic for the "What-If" intervention engine
+│   │   └── view.py              # UI to render the PyVis graph and simulator sidebar
+│   │
+│   └── intelligence/            # Pillar 4: Strategic Analytics
+│       ├── __init__.py
+│       ├── fragility_calc.py    # Math for the 1-100 Fragility Score (teacher/student ratios)
+│       ├── cohort_engine.py     # Uses 'scikit-learn' (K-Means) for dynamic grouping
+│       ├── mentor_matcher.py    # Logic to identify 'Local Legends' based on experience
+│       └── view.py              # The UI that changes based on Admin vs. Teacher role
+│
+├── main.py                      # The Streamlit Entry Point (Your sidebar router)
+└── requirements.txt             # Your dependencies (streamlit, pandas, thefuzz, networkx, scikit-learn, pydeck, pyvis)
