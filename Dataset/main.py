@@ -52,7 +52,7 @@ def generate_star_data(num_rows=3000):
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
     filename = f"STAR_Integrated_Data_{timestamp}.csv"
-    output_folder = "Dataset"
+    output_folder = "Dataset/Data"
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     file_path = os.path.join(output_folder, filename)
