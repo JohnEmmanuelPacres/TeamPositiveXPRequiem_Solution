@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import random
+import os
+from datetime import datetime
 
 def generate_star_data(num_rows=3000):
     regions = ['NCR', 'Region I', 'Region III', 'Region IV-A', 'Region VII', 'Region VIII', 'BARMM']
@@ -47,9 +49,16 @@ def generate_star_data(num_rows=3000):
         })
 
     df = pd.DataFrame(data)
-    
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    filename = f"STAR_Integrated_Data_{timestamp}.csv"
+    output_folder = "Dataset"
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    file_path = os.path.join(output_folder, filename)
+
     # Intentionally corrupt 5% of headers/data to test the "AI Schema-Healer"
-    df.to_csv("STAR_Integrated_Data.csv", index=False)
+    df.to_csv(file_path, index=False)
     print(f"Generated {num_rows} rows. BARMM/Reg VIII biased for fragility.")
 
 generate_star_data(3500)
