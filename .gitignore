@@ -1,0 +1,14 @@
+# VS Code folders and files
+.vscode/
+
+# Local Python Environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Data files (optional - ignore if you don't want to track 3,500+ row CSVs)
+Dataset/STAR_Integrated_Data_*.csv
