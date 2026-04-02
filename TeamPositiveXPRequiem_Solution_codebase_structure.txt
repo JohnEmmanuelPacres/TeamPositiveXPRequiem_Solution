@@ -13,7 +13,7 @@ TeamPositiveXPRequiem_Solution/
 ├── modules/                     # The 4 Core Pillars of the Application
 │   ├── __init__.py
 │   │
-│   ├── geospatial_tracker/      # Pillar 1: The Project NOAH Logistics Map
+│   ├── geospatial_tracker/      # Pillar 1: The Logistics Map
 │   │   ├── __init__.py
 │   │   ├── map_engine.py        # PyDeck configuration (3D heatmaps, ArcLayers)
 │   │   ├── routing.py           # Logic to find the nearest available teacher by skillset
