@@ -68,16 +68,18 @@ def render(df):
                 routing_msg = f"Routing Computed for Regional Anchor {target_region} (Lat: {target_lat:.4f}, Lon: {target_lon:.4f})!"
                 
             query_subject = None if subject == "Any" else subject
-            results = find_nearest_teacher(df, target_lat, target_lon, query_subject)
             
-            # Construct Arc Data for PyDeck lasers (Shooting outwards from Epicenter)
+            from modules.geospatial_tracker.routing import find_teachers_from_top_clusters
+            results = find_teachers_from_top_clusters(df, target_region, target_lat, target_lon, query_subject)
+            
+            # Construct Arc Data for PyDeck lasers (Shooting inwards to Epicenter from healthy zones)
             arcs_data = []
             for _, row in results.iterrows():
                 arcs_data.append({
-                    "Source_Lon": target_lon,
-                    "Source_Lat": target_lat,
-                    "Target_Lon": row["Longitude"],
-                    "Target_Lat": row["Latitude"]
+                    "Source_Lon": row["Longitude"],       # Robust teacher Origin
+                    "Source_Lat": row["Latitude"],        # Robust teacher Origin
+                    "Target_Lon": target_lon,             # Underserved Epicenter Target
+                    "Target_Lat": target_lat              # Underserved Epicenter Target
                 })
             
             import pandas as pd

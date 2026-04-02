@@ -20,8 +20,8 @@ def create_heatmap_layer(df: pd.DataFrame) -> pdk.Layer:
         data=df,
         get_position=["Longitude", "Latitude"],
         auto_highlight=True,
-        radius=5000, # Massive 5km cell radius makes the data bloom comprehensively across the map
-        elevation_scale=300, # Boosted elevation so the wider hexagons still shoot up
+        radius=1500, # Reduced to 1.5km to ensure data points roughly stay inland
+        elevation_scale=100, # Balanced elevation relative to normal radius
         pickable=True,
         elevation_range=[0, 3000],
         extrude=True,
