@@ -43,9 +43,9 @@ def load_and_prepare_data() -> pd.DataFrame:
     df['Longitude'] = df['Region'].apply(get_lon)
     
     # Apply a very tight realistic jitter for Map visualization
-    # 0.03 deviation creates an organic "bell curve" city center look!
-    jitter_lat = np.random.normal(0, 0.03, size=len(df))
-    jitter_lon = np.random.normal(0, 0.03, size=len(df))
+    # Increased to 0.05 dev for realistic scattering while staying safely inland
+    jitter_lat = np.random.normal(0, 0.8, size=len(df))
+    jitter_lon = np.random.normal(0, 0.8, size=len(df))
     
     df['Latitude'] = df['Latitude'] + jitter_lat
     df['Longitude'] = df['Longitude'] + jitter_lon

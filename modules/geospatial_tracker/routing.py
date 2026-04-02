@@ -11,10 +11,12 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 def find_nearest_teacher(df: pd.DataFrame, target_lat, target_lon, subject=None) -> pd.DataFrame:
     """
-    Filters the dataframe for nearest available teachers optionally sorting by a specific subject.
-    Returns the top candidates.
+    Filters the dataframe for nearest available highly-qualified mentors.
+    It intentionally excludes vulnerable teachers to ensure we are deploying resources cleanly.
     """
-    work_df = df.copy()
+    # Only deploy robust teachers who are actually teaching their correct majors
+    work_df = df[df['Fragility_Indicator'] == 'Low'].copy()
+    
     if subject:
         work_df = work_df[work_df["Major_Specialization"].str.contains(subject, case=False, na=False)]
         
@@ -23,5 +25,8 @@ def find_nearest_teacher(df: pd.DataFrame, target_lat, target_lon, subject=None)
         axis=1
     )
     work_df["Distance_from_target"] = distances
+    
+    # Prevent deploying teachers who are already inside the hyper-localized epicenter hotspot
+    work_df = work_df[work_df["Distance_from_target"] > 0.05]
     
     return work_df.sort_values(by="Distance_from_target").head(5)
