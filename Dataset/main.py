@@ -5,9 +5,13 @@ import os
 from datetime import datetime
 
 def generate_star_data(num_rows=3000):
-    regions = ['NCR', 'Region I', 'Region III', 'Region IV-A', 'Region VII', 'Region VIII', 'BARMM']
+    regions = ['NCR', 'CAR', 'Region I', 'Region II', 'Region III', 'Region IV-A', 'Region IV-B', 'Region V', 'Region VI', 'Region VII', 'Region VIII', 'Region IX', 'Region X', 'Region XI', 'Region XII', 'Region XIII', 'BARMM']
     majors = ['Mathematics', 'Biology', 'Chemistry', 'Physics', 'General Science']
     degrees = ['Bachelor of Secondary Education', 'BS Science', 'Master of Arts in Ed', 'PhD STEM']
+    
+    first_names = ['Juan', 'Maria', 'Jose', 'Ana', 'Pedro', 'Rosa', 'Miguel', 'Carmela', 'Luis', 'Teresa', 'Carlos', 'Luz', 'Ramon', 'Beatriz', 'Manuel', 'Elena', 'Antonio', 'Pilar', 'Eduardo', 'Carmen', 'Roberto', 'Sofia', 'Ricardo', 'Lourdes']
+    last_names = ['Cruz', 'Santos', 'Reyes', 'Aquino', 'Garcia', 'Mendoza', 'Bautista', 'Torres', 'Villanueva', 'Gonzales', 'Perez', 'Rodriguez', 'Dela Cruz', 'Rizal', 'Tolentino', 'Ramos', 'Gomez', 'Lopez', 'Fernandez', 'Alvarez', 'Navarro']
+
     
     data = []
 
@@ -38,6 +42,8 @@ def generate_star_data(num_rows=3000):
 
         data.append({
             "Teacher_ID": f"2026-STAR-{i:04d}",
+            "First_Name": random.choice(first_names),
+            "Last_Name": random.choice(last_names),
             "Region": region,
             "Age": age,
             "Years_Experience": years_exp,
@@ -51,7 +57,7 @@ def generate_star_data(num_rows=3000):
     df = pd.DataFrame(data)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-    filename = f"STAR_Integrated_Data_{timestamp}.csv"
+    filename = "STAR_Integrated_Data_Latest.csv"
     output_folder = "Dataset/Data"
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
