@@ -12,7 +12,7 @@ By unifying fragmented data, the **A.S.T.R.A** framework acts as a mathematical 
 - **Prescriptive Intelligence (AI Clustering):** Uses `scikit-learn` K-Means clustering to segment the workforce into dynamic capability cohorts ("Novice Pool", "Core Tier", "Veteran Legends").
 - **Gamified Teacher UX (Role-Based Access):** Features an engaging RPG-inspired interface for end-users, visualizing capabilities via Plotly "Skill-Tree" Radar Charts and dynamically matching them with "Local Legends" for mentorship.
 - **Geospatial Macro-Routing:** A Project NOAH-style 3D logistics map powered by `pydeck` that calculates supply-and-demand to route mentors from robust regional hubs inward to underserved epicenters.
-- **Obsidian Neural Network:** Interactive node topology displaying mentor-mentee connectivity via `NetworkX` and `pyvis`.
+- **Obsidian Mentorship Graph:** Interactive node topology displaying mentor-mentee connectivity via `NetworkX` and `pyvis`.
 
 ## Architecture Overview
 
@@ -24,6 +24,43 @@ The platform is divided into Four Core Pillars:
 2. **Pillar 2: Ingestion Engine**: String normalization ('Schema Healer') utility mapped using `thefuzz[speedup]` to sanitize incoming datasets natively.
 3. **Pillar 3: Network Dashboard**: Interactive node topology representing organic knowledge-transfer graphs.
 4. **Pillar 4: Intelligence Hub**: Real-time math algorithms calculating local Fragility Scores and 2D Cohort Heatmaps for macro-admin oversight.
+
+## Methodology & Mathematical Formalization
+
+While the ultimate vision for A.S.T.R.A explores Graph Neural Networks (GNN) for predictive peer-to-peer vulnerability modeling, the current computational architecture uses a **Deterministic Graph Heuristic** and **K-Means Clustering**. This ensures 100% computational transparency (Explainable AI) suitable for government compliance, while perfectly simulating the topological mapping required for future GNN integration.
+
+### 1. The Fragility Index
+
+The vulnerability of a teacher node is assessed via a weighted heuristic function penalizing out-of-field teaching and lack of experience:
+
+$$
+F(n) = w_1(M_n) + w_2(e^{-\lambda X_n}) + w_3(R_{c})
+$$
+
+_Where:_
+
+- $F(n)$ = Vulnerability of teacher $n$
+- $M_n$ = Binary out-of-field mismatch penalty (Subject vs. Major Specialization)
+- $X_n$ = Years of experience (decaying penalty)
+- $R_c$ = Regional capacity penalty
+
+### 2. Workforce Clustering (K-Means)
+
+Cohorts mathematically minimize variance across the workforce. The model maps features $X = [Age, Experience]$ and minimizes the within-cluster sum of squares to dynamically classify boundaries between the "Novice Pool" and the "Veteran Legends":
+
+$$
+J = \sum_{j=1}^{k} \sum_{i=1}^{n} ||x_i - \mu_j||^2
+$$
+
+### 3. Stochastic Degradation Model (Timeframe Simulator)
+
+The longitudinal tracking dynamically reverse-engineers datasets to simulate programmatic ROI over a closed-system cohort:
+
+$$
+E_{past} = \max(0, E_{current} - \Delta t - \epsilon)
+$$
+
+_Where:_ $\epsilon$ is stochastic noise ($\mathcal{N}$) injected to simulate the uneven, volatile historical capability distributions present prior to A.S.T.R.A framework interventions.
 
 ## Prerequisites
 
