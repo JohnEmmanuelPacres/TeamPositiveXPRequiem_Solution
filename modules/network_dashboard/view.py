@@ -6,7 +6,7 @@ from modules.network_dashboard.simulator import deploy_teacher
 from core.data_loader import REGION_COORDS
 
 def render(df):
-    render_header("Obsidian Neural Network", "Interactive mapping of localized teaching resources.")
+    render_header("Obsidian Mentorship Topology", "Interactive mapping of localized teaching resources.")
     
     col1, col2 = st.columns([3, 1])
     
