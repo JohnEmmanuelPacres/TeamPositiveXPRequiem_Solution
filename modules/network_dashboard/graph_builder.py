@@ -33,15 +33,69 @@ def build_pyvis_graph(df: pd.DataFrame, limit: int = 150) -> str:
         }
         node_color = color_map.get(subject, "#9CA3AF")
         
-        G.add_node(t_id, size=15, color=node_color, title=f"{t_id} | {subject}")
+        is_legend = row["Years_Experience"] >= 15
+        node_shape = "star" if is_legend else "dot"
+        node_size = 25 if is_legend else 15
+        
+        # Enhanced Tooltip/Title for better UX
+        years_exp = row["Years_Experience"]
+        legend_badge = "🌟 Local Legend" if is_legend else "📚 Educator"
+        label_title = f"{t_id}\n{subject}\n{years_exp} Yrs Exp | {legend_badge}"
+        
+        G.add_node(t_id, size=node_size, color=node_color, title=label_title, shape=node_shape)
         G.add_edge(reg, t_id, color="#374151")
         
     # PyVis Rendering
-    net = Network(height="600px", width="100%", bgcolor="#0E1117", font_color="white")
+    net = Network(height="600px", width="100%", bgcolor="#0E1117", font_color="white", select_menu=True, filter_menu=True)
     net.from_nx(G)
     
-    # Physics settings to make it bouncy/springy like Obsidian
-    net.toggle_physics(True)
+    # Improved Physics settings and options for a premium feel
+    net.set_options("""
+    var options = {
+      "nodes": {
+        "borderWidthSelected": 3,
+        "font": {
+          "color": "#ffffff",
+          "size": 14,
+          "face": "Tahoma"
+        },
+        "shadow": {
+          "enabled": true
+        }
+      },
+      "edges": {
+        "color": {
+          "color": "#4a5568",
+          "highlight": "#d1d5db"
+        },
+        "smooth": {
+          "type": "continuous",
+          "forceDirection": "none"
+        }
+      },
+      "physics": {
+        "forceAtlas2Based": {
+          "gravitationalConstant": -100,
+          "centralGravity": 0.01,
+          "springLength": 100,
+          "springConstant": 0.08
+        },
+        "maxVelocity": 50,
+        "solver": "forceAtlas2Based",
+        "timestep": 0.35,
+        "stabilization": {
+          "enabled": true,
+          "iterations": 150
+        }
+      },
+      "interaction": {
+        "hover": true,
+        "tooltipDelay": 200,
+        "zoomView": true,
+        "dragView": true
+      }
+    }
+    """)
     
     # Generate temporary HTML file string
     path = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
