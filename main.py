@@ -12,14 +12,43 @@ initialize_session()
 role = get_current_role()
 
 # Load Global Shared State
+if 'active_year' not in st.session_state:
+    st.session_state['active_year'] = '2026'
+
+def transition_timeframe():
+    new_year = st.session_state["year_radio_key"].split(" ")[0]
+    st.session_state['active_year'] = new_year
+    st.session_state['working_df'] = get_working_dataframe(new_year)
+
+# Sidebar Routing Logic
+st.sidebar.markdown("### Timeframe Simulator")
+
+# Defined years with thematic labels
+timeframes = {
+    "2026": "2026 (Present AI Intervention)",
+    "2025": "2025 (Initial Rollout Phase)",
+    "2024": "2024 (Critical Shortage)",
+    "2023": "2023 (Pandemic Recovery)",
+    "2022": "2022 (Data Baseline)"
+}
+
+options_list = list(timeframes.values())
+default_index = list(timeframes.keys()).index(st.session_state['active_year'])
+
+st.sidebar.radio(
+    "Select Timeline:", 
+    options=options_list, 
+    index=default_index,
+    key="year_radio_key",
+    on_change=transition_timeframe
+)
+
 if 'working_df' not in st.session_state:
-    st.session_state['working_df'] = get_working_dataframe()
+    st.session_state['working_df'] = get_working_dataframe(st.session_state['active_year'])
 
 df = st.session_state['working_df']
 
-# Sidebar Routing Logic
-render_sidebar_auth()
-
+st.sidebar.markdown("---")
 st.sidebar.markdown("### Navigation")
 
 if role == "Admin":
