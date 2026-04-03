@@ -22,7 +22,7 @@ def transition_timeframe():
 
 # Sidebar Routing Logic
 render_sidebar_auth()
-st.sidebar.markdown("### Timeframe Simulator")
+st.sidebar.markdown("### Timeframe")
 
 # Defined years with thematic labels
 timeframes = {
@@ -36,7 +36,7 @@ timeframes = {
 options_list = list(timeframes.values())
 default_index = list(timeframes.keys()).index(st.session_state['active_year'])
 
-st.sidebar.radio(
+st.sidebar.selectbox(
     "Select Timeline:", 
     options=options_list, 
     index=default_index,
