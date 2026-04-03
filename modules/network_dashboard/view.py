@@ -40,35 +40,39 @@ def render(df):
         st.markdown("### Intervention Engine")
         st.info("Simulate re-assigning a teacher to fix regional fragility bottlenecks dynamically.")
         
-        # Select Teacher
-        teacher_categories = df[df["Years_Experience"] >= 10].head(50) # Prefer experienced teachers
-        
-        def format_teacher_label(tid):
-            row = teacher_categories[teacher_categories["Teacher_ID"] == tid].iloc[0]
-            return f"{tid} | {row['Major_Specialization']} ({row['Years_Experience']} Yrs Exp)"
-        
-        teacher_id = st.selectbox(
-            "Select Teacher Node to Reassign", 
-            options=teacher_categories["Teacher_ID"].tolist(),
-            format_func=format_teacher_label
-        )
-        
-        # Select Region
-        new_region = st.selectbox("Target Regional Hub:", list(REGION_COORDS.keys()))
-        
-        if st.button("Trigger Deployment Simulation", width='stretch'):
-            # Update the global working dataframe in session state
-            st.session_state['working_df'] = deploy_teacher(df, teacher_id, new_region)
-            st.success(f"Successfully deployed {teacher_id} to {new_region}. Metrics recalculated.")
-            st.rerun()
+        # Select Teacher - prefer experienced teachers, fall back to all teachers
+        experienced = df[df["Years_Experience"] >= 10].head(50)
+        teacher_categories = experienced if not experienced.empty else df.head(50)
 
-        st.markdown("---")
-        if st.button("Reset Deployment Simulation", width='stretch'):
-            from core.data_loader import get_working_dataframe
-            active_year = st.session_state.get('active_year', '2026')
-            st.session_state['working_df'] = get_working_dataframe(active_year)
-            st.success("Simulation reset. Teachers returned to original regions.")
-            st.rerun()
+        if teacher_categories.empty:
+            st.warning("No teacher data available for simulation.")
+        else:
+            def format_teacher_label(tid):
+                row = teacher_categories[teacher_categories["Teacher_ID"] == tid].iloc[0]
+                return f"{tid} | {row['Major_Specialization']} ({row['Years_Experience']} Yrs Exp)"
+            
+            teacher_id = st.selectbox(
+                "Select Teacher Node to Reassign", 
+                options=teacher_categories["Teacher_ID"].tolist(),
+                format_func=format_teacher_label
+            )
+
+            # Select Region
+            new_region = st.selectbox("Target Regional Hub:", list(REGION_COORDS.keys()))
+
+            if st.button("Trigger Deployment Simulation", use_container_width=True):
+                # Update the global working dataframe in session state
+                st.session_state['working_df'] = deploy_teacher(df, teacher_id, new_region)
+                st.success(f"Successfully deployed {teacher_id} to {new_region}. Metrics recalculated.")
+                st.rerun()
+
+            st.markdown("---")
+            if st.button("Reset Deployment Simulation", use_container_width=True):
+                from core.data_loader import get_working_dataframe
+                active_year = st.session_state.get('active_year', '2026')
+                st.session_state['working_df'] = get_working_dataframe(active_year)
+                st.success("Simulation reset. Teachers returned to original regions.")
+                st.rerun()
 
 
 
