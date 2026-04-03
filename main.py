@@ -21,6 +21,7 @@ def transition_timeframe():
     st.session_state['working_df'] = get_working_dataframe(new_year)
 
 # Sidebar Routing Logic
+render_sidebar_auth()
 st.sidebar.markdown("### Timeframe Simulator")
 
 # Defined years with thematic labels
