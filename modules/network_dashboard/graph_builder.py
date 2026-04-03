@@ -33,15 +33,69 @@ def build_pyvis_graph(df: pd.DataFrame, limit: int = 150) -> str:
         }
         node_color = color_map.get(subject, "#9CA3AF")
         
-        G.add_node(t_id, size=15, color=node_color, title=f"{t_id} | {subject}")
+        is_legend = row["Years_Experience"] >= 15
+        node_shape = "star" if is_legend else "dot"
+        node_size = 25 if is_legend else 15
+        
+        # Enhanced Tooltip/Title for better UX
+        years_exp = row["Years_Experience"]
+        label_title = f"{t_id}\n{subject}\n{years_exp} Yrs Exp"
+        
+        G.add_node(t_id, size=node_size, color=node_color, title=label_title, shape=node_shape)
         G.add_edge(reg, t_id, color="#374151")
         
     # PyVis Rendering
-    net = Network(height="600px", width="100%", bgcolor="#0E1117", font_color="white")
+    net = Network(height="520px", width="100%", bgcolor="#0E1117", font_color="white", select_menu=False, filter_menu=False, cdn_resources="remote")
     net.from_nx(G)
     
-    # Physics settings to make it bouncy/springy like Obsidian
-    net.toggle_physics(True)
+    # Improved Physics settings and options for a premium feel
+    net.set_options("""
+    var options = {
+      "nodes": {
+        "borderWidthSelected": 3,
+        "font": {
+          "color": "#ffffff",
+          "size": 14,
+          "face": "Tahoma"
+        },
+        "shadow": {
+          "enabled": true
+        }
+      },
+      "edges": {
+        "color": {
+          "color": "#4a5568",
+          "highlight": "#d1d5db"
+        },
+        "smooth": {
+          "type": "continuous"
+        }
+      },
+      "physics": {
+        "barnesHut": {
+          "gravitationalConstant": -5000,
+          "centralGravity": 0.3,
+          "springLength": 95,
+          "springConstant": 0.04,
+          "damping": 0.09
+        },
+        "solver": "barnesHut",
+        "stabilization": {
+          "enabled": true,
+          "iterations": 50,
+          "updateInterval": 10,
+          "onlyDynamicEdges": false,
+          "fit": true
+        }
+      },
+      "interaction": {
+        "hover": true,
+        "tooltipDelay": 200,
+        "zoomView": true,
+        "dragView": true
+      }
+    }
+    """)
     
     # Generate temporary HTML file string
     path = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
