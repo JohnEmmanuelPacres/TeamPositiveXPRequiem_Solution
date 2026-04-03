@@ -56,7 +56,7 @@ if role == "Admin":
     options = [
         "Intelligence Analytics", 
         "Deployment Logistics Map", 
-        "Obsidian Neural Network",
+        "Obsidian Mentorship Topology",
         "Ingestion Engine (Schema Healer)"
     ]
     selection = st.sidebar.radio("Go to module:", options)
@@ -69,7 +69,7 @@ if role == "Admin":
         from modules.geospatial_tracker.view import render as render_geo
         render_geo(df)
         
-    elif selection == "Obsidian Neural Network":
+    elif selection == "Obsidian Mentorship Topology":
         from modules.network_dashboard.view import render as render_net
         render_net(df)
         
@@ -90,7 +90,7 @@ else:
         render_intel(df)
         
     elif selection == "Local Ecosystem (Network)":
-        # Simplified Neural Network passing regional filter requirement conceptually
+        # Simplified Network passing regional filter requirement conceptually
         from modules.network_dashboard.graph_builder import build_pyvis_graph
         import streamlit.components.v1 as components
         
