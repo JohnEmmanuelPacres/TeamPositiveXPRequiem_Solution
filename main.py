@@ -13,8 +13,11 @@ role = get_current_role()
 
 # Load Global Shared State
 if 'working_df' not in st.session_state:
+    # This only runs the very first time the app starts
     st.session_state['working_df'] = get_working_dataframe()
 
+# We pull from session_state so that if the Ingestion Engine "Heals" the data, 
+# the rest of the app (Map, Network, Analytics) uses the NEW clean data.
 df = st.session_state['working_df']
 
 # Sidebar Routing Logic
@@ -45,6 +48,8 @@ if role == "Admin":
         
     elif selection == "Ingestion Engine (Schema Healer)":
         from modules.ingestion.view import render as render_ingest
+        # We don't pass 'df' here because the Ingestion View 
+        # will directly update st.session_state['working_df']
         render_ingest()
 
 else:
