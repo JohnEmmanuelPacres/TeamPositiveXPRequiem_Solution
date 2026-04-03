@@ -1,6 +1,6 @@
 # Team PositiveXPRequiem | A.S.T.R.A Framework
 
-**DOST Hackathon Decision Support System (DSS)**
+**START-DOST Hackathon Solution: Decision Support System (DSS)**
 
 This project is a professional-grade predictive Decision Support System (DSS) designed to track, analyze, and mitigate structural risks—specifically **out-of-field teaching**—in the Philippine science and mathematics education sector.
 
