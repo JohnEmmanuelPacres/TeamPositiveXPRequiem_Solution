@@ -24,52 +24,69 @@ def get_coordinates(df):
     FREE GEOCODER: Converts 'Region' names to Lat/Lng.
     This bridges Feature 4 (Ingestion) with Feature 1 (Geospatial).
     """
-    if 'Region' not in df.columns:
+    # If the AI renamed a column to 'Region', we use it. 
+    # Otherwise, we look for anything that sounds like 'Region'
+    region_col = None
+    for col in df.columns:
+        if col.lower() in ['region', 'lugar', 'location', 'province']:
+            region_col = col
+            break
+            
+    if not region_col:
         return df
     
     geolocator = Nominatim(user_agent="positive_xp_requiem_dss")
-    geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
+    geocode = RateLimiter(geolocator.geocode, min_delay_seconds=0.8)
     
-    unique_regions = df['Region'].unique()
+    # We only geocode UNIQUE regions to save time and API limits
+    unique_regions = df[region_col].dropna().unique()
     coords_map = {}
     
     for loc in unique_regions:
         try:
-            # We search within Philippines for better accuracy
+            # Adding ", Philippines" makes it much more accurate
             location = geocode(f"{loc}, Philippines")
             if location:
                 coords_map[loc] = (location.latitude, location.longitude)
         except:
             continue
             
-    df['latitude'] = df['Region'].map(lambda x: coords_map.get(x, (12.8797, 121.7740))[0])
-    df['longitude'] = df['Region'].map(lambda x: coords_map.get(x, (12.8797, 121.7740))[1])
+    # Apply the coordinates back to the dataframe
+    df['latitude'] = df[region_col].map(lambda x: coords_map.get(x, (12.8797, 121.7740))[0])
+    df['longitude'] = df[region_col].map(lambda x: coords_map.get(x, (12.8797, 121.7740))[1])
     return df
 
 def ai_normalize_columns(df: pd.DataFrame) -> (pd.DataFrame, dict):
+    """
+    AI Semantic Mapping: Renames messy columns but PRESERVES all original data.
+    """
     model = load_semantic_model()
     raw_cols = df.columns.tolist()
     
-    # 1. AI Semantic Mapping (Calculating Meaning)
+    # AI converts our standard into mathematical vectors
     target_embeddings = model.encode(TARGET_SCHEMA, convert_to_tensor=True)
     mapping = {}
     
     for raw in raw_cols:
+        # AI converts the messy column header into a vector
         raw_embedding = model.encode(raw, convert_to_tensor=True)
-        # Compare messy column to all target columns
+        
+        # Calculate cosine similarity
         cos_scores = util.cos_sim(raw_embedding, target_embeddings)[0]
         best_match_idx = torch.argmax(cos_scores).item()
         
-        if cos_scores[best_match_idx] > 0.45: # Confidence threshold
+        if cos_scores[best_match_idx] > 0.45: # AI similarity threshold
             mapping[raw] = TARGET_SCHEMA[best_match_idx]
         else:
-            # 2. Fallback to Fuzzy Matching if AI is unsure
+            # Fallback to Fuzzy Matching for acronyms (e.g., 'Tcher_ID')
             best_fuzzy, score = process.extractOne(raw, TARGET_SCHEMA, scorer=fuzz.token_sort_ratio)
-            if score > 60:
+            if score > 65:
                 mapping[raw] = best_fuzzy
 
+    # RENAME columns based on mapping
     df_clean = df.rename(columns=mapping)
     
-    # Keep only standard columns + any lat/lng we might add
-    valid_cols = [c for c in df_clean.columns if c in TARGET_SCHEMA]
-    return df_clean[valid_cols], mapping
+    # CRITICAL FIX: We no longer filter columns. 
+    # This returns the WHOLE dataframe with all original columns intact, 
+    # but with the specific ones renamed to match our system logic.
+    return df_clean, mapping
