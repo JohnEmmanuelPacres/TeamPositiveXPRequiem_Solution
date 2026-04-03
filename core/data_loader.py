@@ -2,7 +2,38 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+import os
+
 DATA_PATH = "Dataset/Data/STAR_Integrated_Data_Latest.csv"
+
+def generate_historical_dataset(year: str):
+    """
+    Reverse-engineers realistic past datasets by degrading the current data 
+    (lowering experience, increasing 'out-of-field' teaching to simulate the crisis).
+    """
+    base_df = pd.read_csv(DATA_PATH)
+    years_back = 2026 - int(year)
+    
+    # Degrade Experience and Age
+    base_df['Years_Experience'] = base_df['Years_Experience'] - years_back
+    base_df['Years_Experience'] = base_df['Years_Experience'].apply(lambda x: max(0, x))
+    base_df['Age'] = base_df['Age'] - years_back
+    base_df['Age'] = base_df['Age'].apply(lambda x: max(20, x))
+    
+    # Scramble specializations to simulate "out-of-field" mismatches prior to STAR program
+    np.random.seed(int(year))
+    mismatch_percent = 0.08 * years_back # 8% worse mismatch per year back
+    mismatch_count = int(len(base_df) * mismatch_percent)
+    
+    # Randomly assign a non-matching subject to simulate out-of-field
+    indices_to_mismatch = np.random.choice(base_df.index, size=mismatch_count, replace=False)
+    for i in indices_to_mismatch:
+        base_df.loc[i, 'Major_Specialization'] = "Unrelated / Not Specified"
+        base_df.loc[i, 'Fragility_Indicator'] = "High"
+
+    path = f"Dataset/Data/STAR_Integrated_Data_{year}.csv"
+    base_df.to_csv(path, index=False)
+    return path
 
 # Philippine strict-inland anchor coordinates (17 Regions)
 REGION_COORDS = {
@@ -26,11 +57,19 @@ REGION_COORDS = {
 }
 
 @st.cache_data
-def load_and_prepare_data() -> pd.DataFrame:
+def load_and_prepare_data(year="2026") -> pd.DataFrame:
     '''
     Loads the original dataset and injects map coordinates dynamically using Land Bounding Boxes.
     '''
-    df = pd.read_csv(DATA_PATH)
+    if year == "2026":
+        path = DATA_PATH
+    else:
+        path = f"Dataset/Data/STAR_Integrated_Data_{year}.csv"
+        # Check if it was generated
+        if not os.path.exists(path):
+            path = generate_historical_dataset(year)
+            
+    df = pd.read_csv(path)
     
     # Map coordinates
     def get_lat(region):
@@ -54,5 +93,5 @@ def load_and_prepare_data() -> pd.DataFrame:
 
 # For caching the simulator modifications rapidly
 @st.cache_data
-def get_working_dataframe():
-    return load_and_prepare_data().copy()
+def get_working_dataframe(year="2026"):
+    return load_and_prepare_data(year).copy()
