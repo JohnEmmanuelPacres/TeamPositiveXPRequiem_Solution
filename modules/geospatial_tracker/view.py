@@ -14,12 +14,12 @@ def render(df):
         
     render_header("Deployment Logistics Map", "Geospatial deployment and vulnerability tracking.")
     
-    # --- START FIX: COLUMN VALIDATION ---
-    required_cols = ['Subject_Taught', 'Major_Specialization', 'Region']
+    # --- START FIX: COLUMN VALIDATION (Lowercase synchronized) ---
+    required_cols = ['subject_taught', 'major_specialization', 'region']
     has_required_data = all(col in df.columns for col in required_cols)
     
     if not has_required_data:
-        st.error("⚠️ **Schema Mismatch Detected:** The current dataset is missing standardized columns (Major_Specialization or Subject_Taught).")
+        st.error("⚠️ **Schema Mismatch Detected:** The current dataset is missing standardized columns (major_specialization or subject_taught).")
         st.info("Please go to the **Ingestion Engine (Schema Healer)** and run the AI Semantic Fusion to prepare the data.")
         # Provide a safe fallback for display purposes
         map_df = df.copy()
@@ -35,18 +35,18 @@ def render(df):
         map_df = df.copy()
         if "Underserved" in view_mode:
             # Isolate the map to ONLY show vulnerable (structurally mismatched) teachers
-            map_df = df[df['Subject_Taught'] != df['Major_Specialization']].copy()
+            map_df = df[df['subject_taught'] != df['major_specialization']].copy()
         
     render_map(map_df, arcs_df=st.session_state.get('routing_arcs_df'))
     
     st.markdown("---")
     st.subheader("Dispatch Routing Algorithm")
     
-    # --- START FIX: CONDITIONAL MATH ---
+    # --- START FIX: CONDITIONAL MATH (Lowercase synchronized) ---
     if has_required_data:
         # Mathematical Priority Calculation
-        mismatches = df[df['Subject_Taught'] != df['Major_Specialization']].groupby('Region').size()
-        totals = df.groupby('Region').size()
+        mismatches = df[df['subject_taught'] != df['major_specialization']].groupby('region').size()
+        totals = df.groupby('region').size()
         fragility_rates = (mismatches / totals * 100).fillna(0)
         
         if not fragility_rates.empty:
@@ -96,19 +96,19 @@ def render(df):
             from modules.geospatial_tracker.routing import find_teachers_from_top_clusters
             results = find_teachers_from_top_clusters(df, target_region, target_lat, target_lon, query_subject)
             
-            # Construct Arc Data for PyDeck lasers (Shooting inwards to Epicenter from healthy zones)
+            # Construct Arc Data for PyDeck lasers
             arcs_data = []
             for _, row in results.iterrows():
-                # Ensure coordinates exist
-                source_lat = row.get("Latitude") or row.get("latitude")
-                source_lon = row.get("Longitude") or row.get("longitude")
+                # Ensure coordinates exist (Ingestion engine outputs lowercase 'latitude'/'longitude')
+                source_lat = row.get("latitude") or row.get("Latitude")
+                source_lon = row.get("longitude") or row.get("Longitude")
                 
                 if source_lat and source_lon:
                     arcs_data.append({
-                        "Source_Lon": source_lon,             # Robust teacher Origin
-                        "Source_Lat": source_lat,             # Robust teacher Origin
-                        "Target_Lon": target_lon,             # Underserved Epicenter Target
-                        "Target_Lat": target_lat              # Underserved Epicenter Target
+                        "Source_Lon": source_lon,
+                        "Source_Lat": source_lat,
+                        "Target_Lon": target_lon,
+                        "Target_Lat": target_lat
                     })
             
             import pandas as pd
@@ -121,7 +121,12 @@ def render(df):
     if st.session_state.get('dispatch_results') is not None:
         st.success(st.session_state['dispatch_msg'])
         for _, row in st.session_state['dispatch_results'].iterrows():
-            # Check for name columns safely
-            f_name = row.get('First_Name', 'N/A')
-            l_name = row.get('Last_Name', '')
-            st.markdown(f"**{row['Teacher_ID']}** ({f_name} {l_name} | Exp: {row.get('Years_Experience', 0)} yrs) | Spec: **{row.get('Major_Specialization', 'N/A')}** | Distance: `{row.get('Distance_from_target', 0):.4f}`")
+            # Check for name and experience columns safely (lowercase)
+            f_name = row.get('first_name') or row.get('First_Name') or 'N/A'
+            l_name = row.get('last_name') or row.get('Last_Name') or ''
+            t_id = row.get('teacher_id') or row.get('Teacher_ID') or 'Unknown'
+            exp = row.get('years_experience') or row.get('Years_Experience') or 0
+            spec = row.get('major_specialization') or row.get('Major_Specialization') or 'N/A'
+            dist = row.get('distance_from_target') or row.get('Distance_from_target') or 0
+            
+            st.markdown(f"**{t_id}** ({f_name} {l_name} | Exp: {exp} yrs) | Spec: **{spec}** | Distance: `{dist:.4f}`")
