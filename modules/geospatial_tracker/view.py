@@ -14,34 +14,58 @@ def render(df):
         
     render_header("Deployment Logistics Map", "Geospatial deployment and vulnerability tracking.")
     
-    col_a, col_b = st.columns([1, 1])
-    with col_a:
-        st.markdown("### Regional Geospatial Map")
-    with col_b:
-        view_mode = st.radio("Visualization Mode", ["Total Workforce Density", "Underserved Hotspots (Out-of-Field)"], horizontal=True, label_visibility="collapsed")
-        
-    map_df = df.copy()
-    if "Underserved" in view_mode:
-        # Isolate the map to ONLY show vulnerable (structurally mismatched) teachers
-        map_df = df[df['Subject_Taught'] != df['Major_Specialization']].copy()
+    # --- START FIX: COLUMN VALIDATION ---
+    required_cols = ['Subject_Taught', 'Major_Specialization', 'Region']
+    has_required_data = all(col in df.columns for col in required_cols)
+    
+    if not has_required_data:
+        st.error("⚠️ **Schema Mismatch Detected:** The current dataset is missing standardized columns (Major_Specialization or Subject_Taught).")
+        st.info("Please go to the **Ingestion Engine (Schema Healer)** and run the AI Semantic Fusion to prepare the data.")
+        # Provide a safe fallback for display purposes
+        map_df = df.copy()
+        view_mode = "Total Workforce Density"
+    else:
+        # --- END FIX ---
+        col_a, col_b = st.columns([1, 1])
+        with col_a:
+            st.markdown("### Regional Geospatial Map")
+        with col_b:
+            view_mode = st.radio("Visualization Mode", ["Total Workforce Density", "Underserved Hotspots (Out-of-Field)"], horizontal=True, label_visibility="collapsed")
+            
+        map_df = df.copy()
+        if "Underserved" in view_mode:
+            # Isolate the map to ONLY show vulnerable (structurally mismatched) teachers
+            map_df = df[df['Subject_Taught'] != df['Major_Specialization']].copy()
         
     render_map(map_df, arcs_df=st.session_state.get('routing_arcs_df'))
     
     st.markdown("---")
     st.subheader("Dispatch Routing Algorithm")
     
-    # Mathematical Priority Calculation
-    mismatches = df[df['Subject_Taught'] != df['Major_Specialization']].groupby('Region').size()
-    totals = df.groupby('Region').size()
-    fragility_rates = (mismatches / totals * 100).fillna(0)
-    priority_region = fragility_rates.idxmax()
-    priority_rate = fragility_rates.max()
-    
-    st.warning(f"**AI Regional Suggestion:** The system suggests prioritizing **{priority_region}**. Data indicates a `{priority_rate:.1f}%` out-of-field teaching vulnerability in this macro-zone.")
+    # --- START FIX: CONDITIONAL MATH ---
+    if has_required_data:
+        # Mathematical Priority Calculation
+        mismatches = df[df['Subject_Taught'] != df['Major_Specialization']].groupby('Region').size()
+        totals = df.groupby('Region').size()
+        fragility_rates = (mismatches / totals * 100).fillna(0)
+        
+        if not fragility_rates.empty:
+            priority_region = fragility_rates.idxmax()
+            priority_rate = fragility_rates.max()
+        else:
+            priority_region = "NCR"
+            priority_rate = 0
+            
+        st.warning(f"**AI Regional Suggestion:** The system suggests prioritizing **{priority_region}**. Data indicates a `{priority_rate:.1f}%` out-of-field teaching vulnerability in this macro-zone.")
+    else:
+        priority_region = "NCR"
+        st.warning("Priority suggestions are unavailable until data is standardized via Ingestion Engine.")
+    # --- END FIX ---
     
     col1, col2 = st.columns(2)
     with col1:
         region_options = list(REGION_COORDS.keys())
+        # Safe handling of default index
         default_index = region_options.index(priority_region) if priority_region in region_options else 0
         target_region = st.selectbox("Target Deployment Zone", region_options, index=default_index)
         
@@ -75,12 +99,17 @@ def render(df):
             # Construct Arc Data for PyDeck lasers (Shooting inwards to Epicenter from healthy zones)
             arcs_data = []
             for _, row in results.iterrows():
-                arcs_data.append({
-                    "Source_Lon": row["Longitude"],       # Robust teacher Origin
-                    "Source_Lat": row["Latitude"],        # Robust teacher Origin
-                    "Target_Lon": target_lon,             # Underserved Epicenter Target
-                    "Target_Lat": target_lat              # Underserved Epicenter Target
-                })
+                # Ensure coordinates exist
+                source_lat = row.get("Latitude") or row.get("latitude")
+                source_lon = row.get("Longitude") or row.get("longitude")
+                
+                if source_lat and source_lon:
+                    arcs_data.append({
+                        "Source_Lon": source_lon,             # Robust teacher Origin
+                        "Source_Lat": source_lat,             # Robust teacher Origin
+                        "Target_Lon": target_lon,             # Underserved Epicenter Target
+                        "Target_Lat": target_lat              # Underserved Epicenter Target
+                    })
             
             import pandas as pd
             st.session_state['routing_arcs_df'] = pd.DataFrame(arcs_data)
@@ -92,5 +121,7 @@ def render(df):
     if st.session_state.get('dispatch_results') is not None:
         st.success(st.session_state['dispatch_msg'])
         for _, row in st.session_state['dispatch_results'].iterrows():
-            st.markdown(f"**{row['Teacher_ID']}** ({row['First_Name']} {row['Last_Name']} | Exp: {row['Years_Experience']} yrs) | Spec: **{row['Major_Specialization']}** | Distance: `{row['Distance_from_target']:.4f}`")
-
+            # Check for name columns safely
+            f_name = row.get('First_Name', 'N/A')
+            l_name = row.get('Last_Name', '')
+            st.markdown(f"**{row['Teacher_ID']}** ({f_name} {l_name} | Exp: {row.get('Years_Experience', 0)} yrs) | Spec: **{row.get('Major_Specialization', 'N/A')}** | Distance: `{row.get('Distance_from_target', 0):.4f}`")
