@@ -69,7 +69,7 @@ def render(df):
         # Select Region
         new_region = st.selectbox("Target Regional Hub:", list(REGION_COORDS.keys()))
         
-        if st.button("🚀 Trigger Deployment Simulation", use_container_width=True):
+        if st.button("🚀 Trigger Deployment Simulation", width='stretch'):
             # Update the global working dataframe in session state
             st.session_state['working_df'] = deploy_teacher(df, teacher_id, new_region)
             st.success(f"Successfully deployed {teacher_id} to {new_region}. Metrics recalculated.")

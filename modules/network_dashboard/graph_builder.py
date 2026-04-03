@@ -46,7 +46,7 @@ def build_pyvis_graph(df: pd.DataFrame, limit: int = 150) -> str:
         G.add_edge(reg, t_id, color="#374151")
         
     # PyVis Rendering
-    net = Network(height="600px", width="100%", bgcolor="#0E1117", font_color="white", select_menu=True, filter_menu=True)
+    net = Network(height="600px", width="100%", bgcolor="#0E1117", font_color="white", select_menu=False, filter_menu=False, cdn_resources="remote")
     net.from_nx(G)
     
     # Improved Physics settings and options for a premium feel
@@ -69,23 +69,24 @@ def build_pyvis_graph(df: pd.DataFrame, limit: int = 150) -> str:
           "highlight": "#d1d5db"
         },
         "smooth": {
-          "type": "continuous",
-          "forceDirection": "none"
+          "type": "continuous"
         }
       },
       "physics": {
-        "forceAtlas2Based": {
-          "gravitationalConstant": -100,
-          "centralGravity": 0.01,
-          "springLength": 100,
-          "springConstant": 0.08
+        "barnesHut": {
+          "gravitationalConstant": -5000,
+          "centralGravity": 0.3,
+          "springLength": 95,
+          "springConstant": 0.04,
+          "damping": 0.09
         },
-        "maxVelocity": 50,
-        "solver": "forceAtlas2Based",
-        "timestep": 0.35,
+        "solver": "barnesHut",
         "stabilization": {
-          "enabled": true,
-          "iterations": 150
+          "enabled": false,
+          "iterations": 50,
+          "updateInterval": 25,
+          "onlyDynamicEdges": false,
+          "fit": true
         }
       },
       "interaction": {
