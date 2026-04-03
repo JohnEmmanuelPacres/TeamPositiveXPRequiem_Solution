@@ -21,7 +21,8 @@ def transition_timeframe():
     st.session_state['working_df'] = get_working_dataframe(new_year)
 
 # Sidebar Routing Logic
-st.sidebar.markdown("### Timeframe Simulator")
+render_sidebar_auth()
+st.sidebar.markdown("### Timeframe")
 
 # Defined years with thematic labels
 timeframes = {
@@ -35,7 +36,7 @@ timeframes = {
 options_list = list(timeframes.values())
 default_index = list(timeframes.keys()).index(st.session_state['active_year'])
 
-st.sidebar.radio(
+st.sidebar.selectbox(
     "Select Timeline:", 
     options=options_list, 
     index=default_index,

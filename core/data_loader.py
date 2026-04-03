@@ -14,14 +14,17 @@ def generate_historical_dataset(year: str):
     base_df = pd.read_csv(DATA_PATH)
     years_back = 2026 - int(year)
     
-    # Degrade Experience and Age
-    base_df['Years_Experience'] = base_df['Years_Experience'] - years_back
+    np.random.seed(int(year))
+    # Degrade Experience and Age with random penalties to simulate non-uniform progression
+    # The further back in time, the wider the variance of experience loss, padding the Novice pool
+    random_xp_penalty = np.random.randint(0, 3 + (years_back * 2), size=len(base_df))
+    base_df['Years_Experience'] = base_df['Years_Experience'] - years_back - random_xp_penalty
     base_df['Years_Experience'] = base_df['Years_Experience'].apply(lambda x: max(0, x))
+    
     base_df['Age'] = base_df['Age'] - years_back
     base_df['Age'] = base_df['Age'].apply(lambda x: max(20, x))
     
     # Scramble specializations to simulate "out-of-field" mismatches prior to STAR program
-    np.random.seed(int(year))
     mismatch_percent = 0.08 * years_back # 8% worse mismatch per year back
     mismatch_count = int(len(base_df) * mismatch_percent)
     

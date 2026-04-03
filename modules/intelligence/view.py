@@ -57,10 +57,10 @@ def render(df):
         
         # 4 Visualization Tabs
         tab1, tab2, tab3, tab4 = st.tabs([
-            "📊 Overview Dashboard",
-            "🎯 Cohort Analysis",
-            "🌍 Regional Heatmap",
-            "🤝 Mentorship Network"
+            "Overview Dashboard",
+            "Cohort Analysis",
+            "Regional Heatmap",
+            "Mentorship Network"
         ])
         
         # ============ TAB 1: Overview Dashboard ============
@@ -138,32 +138,36 @@ def render(df):
         
         # ============ TAB 3: Regional Heatmap ============
         with tab3:
-            st.markdown("### Regional Fragility Heatmap")
+            st.markdown("### Regional Cohort Density Heatmap")
             
-            regional_fragility = df_scored.groupby('Region')['Calculated_Fragility_Score'].agg(['mean', 'count']).round(2)
-            regional_fragility = regional_fragility.sort_values('mean', ascending=False)
+            # Create a true 2D matrix: Region vs Cohort Count
+            heatmap_data = df_clustered.groupby(['Region', 'Cohort_Name']).size().unstack(fill_value=0)
             
-            fig_heat = go.Figure(data=[
-                go.Bar(
-                    x=regional_fragility.index,
-                    y=regional_fragility['mean'],
-                    marker_color=['#F43F5E' if x > 75 else '#FCD34D' if x > 50 else '#10B981' for x in regional_fragility['mean']],
-                    text=[f"{x:.0f}" for x in regional_fragility['mean']],
-                    textposition='auto'
-                )
-            ])
+            # Sort by Novice Pool to bubble the most vulnerable regions to the top of the heatmap
+            if 'Novice Pool' in heatmap_data.columns:
+                heatmap_data = heatmap_data.sort_values(by='Novice Pool', ascending=True)
+            
+            fig_heat = go.Figure(data=go.Heatmap(
+                z=heatmap_data.values,
+                x=heatmap_data.columns,
+                y=heatmap_data.index,
+                colorscale=[[0, '#1E293B'], [0.5, '#FCD34D'], [1.0, '#F43F5E']], # Dark to Yellow to Red (Heat)
+                text=heatmap_data.values,
+                texttemplate="%{text}",
+                showscale=True
+            ))
+            
             fig_heat.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 font=dict(color='white'),
-                xaxis_title="Region",
-                yaxis_title="Average Fragility Score",
-                showlegend=False
+                xaxis_title="Cohort Class",
+                yaxis_title="Region"
             )
             st.plotly_chart(fig_heat, use_container_width=True)
             
-            st.markdown("**Regional Summary**")
-            st.dataframe(regional_fragility, use_container_width=True)
+            st.markdown("**Cohort Distribution by Region**")
+            st.dataframe(heatmap_data.sort_values(by=heatmap_data.columns[0], ascending=False) if not heatmap_data.empty else heatmap_data, use_container_width=True)
         
         # ============ TAB 4: Mentorship Network ============
         with tab4:
