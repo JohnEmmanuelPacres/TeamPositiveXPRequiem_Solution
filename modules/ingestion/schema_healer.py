@@ -57,36 +57,22 @@ def get_coordinates(df):
     return df
 
 def ai_normalize_columns(df: pd.DataFrame) -> (pd.DataFrame, dict):
-    """
-    AI Semantic Mapping: Renames messy columns but PRESERVES all original data.
-    """
     model = load_semantic_model()
     raw_cols = df.columns.tolist()
     
-    # AI converts our standard into mathematical vectors
     target_embeddings = model.encode(TARGET_SCHEMA, convert_to_tensor=True)
     mapping = {}
     
     for raw in raw_cols:
-        # AI converts the messy column header into a vector
         raw_embedding = model.encode(raw, convert_to_tensor=True)
-        
-        # Calculate cosine similarity
         cos_scores = util.cos_sim(raw_embedding, target_embeddings)[0]
         best_match_idx = torch.argmax(cos_scores).item()
         
-        if cos_scores[best_match_idx] > 0.45: # AI similarity threshold
+        # We only rename if we are 45% sure it matches a target
+        if cos_scores[best_match_idx] > 0.45:
             mapping[raw] = TARGET_SCHEMA[best_match_idx]
-        else:
-            # Fallback to Fuzzy Matching for acronyms (e.g., 'Tcher_ID')
-            best_fuzzy, score = process.extractOne(raw, TARGET_SCHEMA, scorer=fuzz.token_sort_ratio)
-            if score > 65:
-                mapping[raw] = best_fuzzy
 
-    # RENAME columns based on mapping
+    # RENAMING: This keeps ALL columns, but changes the names of the ones we found
     df_clean = df.rename(columns=mapping)
     
-    # CRITICAL FIX: We no longer filter columns. 
-    # This returns the WHOLE dataframe with all original columns intact, 
-    # but with the specific ones renamed to match our system logic.
     return df_clean, mapping
