@@ -167,8 +167,8 @@ def render(df):
             st.plotly_chart(fig_heat, use_container_width=True)
             
             st.markdown("**Cohort Distribution by Region**")
-            st.dataframe(heatmap_data.sort_values(by=heatmap_data.columns[0], ascending=False) if not heatmap_data.empty else heatmap_data, use_container_width=True)
-        
+            table_data = heatmap_data.sort_values(by = 'Novice Pool', ascending=False) if 'Novice Pool' in heatmap_data.columns else heatmap_data
+            st.dataframe(table_data, use_container_width=True)        
         # ============ TAB 4: Mentorship Network ============
         with tab4:
             st.markdown("### Mentorship Ecosystem Overview")
