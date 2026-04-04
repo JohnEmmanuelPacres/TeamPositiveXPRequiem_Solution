@@ -1,9 +1,11 @@
 import networkx as nx
+import streamlit as st
 from pyvis.network import Network
 import pandas as pd
 import tempfile
 from core.dataframe_schema import normalize_record_columns
 
+@st.cache_data
 def build_pyvis_graph(df: pd.DataFrame, limit: int = 150) -> str:
     """
     Builds a PyVis HTML graph. 

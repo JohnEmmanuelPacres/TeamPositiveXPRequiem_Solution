@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 from core.dataframe_schema import normalize_record_columns
 
 def calculate_fragility_score(row) -> int:
@@ -27,6 +28,7 @@ def calculate_fragility_score(row) -> int:
         
     return max(1, min(100, score))
 
+@st.cache_data
 def append_fragility_scores(df: pd.DataFrame) -> pd.DataFrame:
     df_new = normalize_record_columns(df, include_legacy_aliases=True)
     df_new["calculated_fragility_score"] = df_new.apply(calculate_fragility_score, axis=1)

@@ -1,7 +1,9 @@
 import pandas as pd
+import streamlit as st
 from sklearn.cluster import KMeans
 from core.dataframe_schema import normalize_record_columns
 
+@st.cache_data
 def generate_cohorts(df: pd.DataFrame) -> pd.DataFrame:
     '''
     Uses K-Means clustering to identify dynamic talent pools based on Age and Experience.

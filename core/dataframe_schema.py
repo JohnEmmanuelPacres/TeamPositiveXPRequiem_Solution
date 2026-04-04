@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import streamlit as st
 
 
 def to_lower_snake(name: str) -> str:
@@ -7,7 +8,7 @@ def to_lower_snake(name: str) -> str:
     text = re.sub(r"[^a-z0-9]+", "_", text)
     return re.sub(r"_+", "_", text).strip("_")
 
-
+@st.cache_data
 def normalize_record_columns(df: pd.DataFrame, include_legacy_aliases: bool = False) -> pd.DataFrame:
     """
     Normalize dataframe columns into lowercase snake_case.
