@@ -10,11 +10,24 @@ By unifying fragmented data, the **A.S.T.R.A** framework acts as a mathematical 
 
 - [Hackathon Highlights & Core Features](#hackathon-highlights--core-features)
 - [Architecture Overview](#architecture-overview)
+  - [The Technology Stack](#the-technology-stack)
+  - [The Four Core Pillars](#the-four-core-pillars)
 - [Recent Updates & Optimizations](#recent-updates--optimizations)
+- [Hackathon End-to-End Simulation Walkthrough](#hackathon-end-to-end-simulation-walkthrough)
+  - [1. Activating the Security Gateway](#1-activating-the-security-gateway)
+  - [2. The Ingestion Engine (Automated Data Fusion)](#2-the-ingestion-engine-automated-data-fusion)
+  - [3. Prescriptive Intelligence Engine (Analytics)](#3-prescriptive-intelligence-engine-analytics)
+  - [4. Deployment Logistics Map (Live Operations)](#4-deployment-logistics-map-live-operations)
+  - [5. Individualized Teacher View (Localized UI)](#5-individualized-teacher-view-localized-ui)
 - [Methodology & Mathematical Formalization](#methodology--mathematical-formalization)
+  - [1. The Fragility Index](#1-the-fragility-index)
+  - [2. Workforce Clustering (K-Means)](#2-workforce-clustering-k-means)
+  - [3. Stochastic Degradation Model (Timeframe Simulator)](#3-stochastic-degradation-model-timeframe-simulator)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Running the Dashboard](#running-the-dashboard)
+  - [Local Native Execution](#local-native-execution)
+  - [Using Docker](#using-docker)
 
 ## Hackathon Highlights & Core Features
 
@@ -58,14 +71,50 @@ The system operates as a **Modular Monolith** built entirely in Python via Strea
 
 ## Recent Updates & Optimizations
 
-To prepare for the final presentation and ensure a seamless, production-ready user experience, several core engine and UI optimizations were recently implemented:
+To prepare for prototype presentation and ensure a seamless, production-ready user experience, several core engine and UI optimizations were recently implemented:
 
 - **Mentorship Ecosystem Overhaul**: Upgraded the _Intelligence Hub_ with sleek UI metric cards and transitioned from standard Plotly overlays to GPU-accelerated **`go.Scattergl`**. This resolved browser lagging issues when visualizing dense cohort demographic scatter plots.
 - **Micro-Transition Caching**: Implemented Streamlit's `@st.cache_data` decorators across computationally expensive ML functions (`generate_cohorts`, `build_pyvis_graph`, `find_nearest_teacher`). Module-switching latency has been entirely eliminated, delivering near-instantaneous navigation.
 - **Geospatial Model Toggling**: Integrated dynamic UI controls (`st.radio`) directly into the Geospatial Tracker. Users can now seamlessly toggle map projections between the synthetic simulation dataset and live data piped from the AI Ingestion Engine.
 - **AI Model Initialization Feedbacks**: Wrapped HuggingFace model loading (`SentenceTransformer` and `MarianMTModel`) in `@st.cache_resource` with an asynchronous visual spinner. This informs users that semantic NLP models are booting into RAM during the first load of the Ingestion Engine, hiding the loading freeze.
 - **Defensive Data Forecasts**: Built exception-handling buffers around the longitudinal forecasting algorithm (`np.polyfit`) to prevent pipeline crashes when mapping array dimensions across incomplete data points.
-- **Dynamic Schema Normalization**: Upgraded the core DataFrame schema dictionary to strictly maintain `PascalCase` mappings where required, successfully fixing UI parsing errors (`KeyError: 'Cohort_Name'`) and automatically deduplicating table outputs.
+- **CSV-Backed Security Gateway**: Implemented an explicit, CSV database-backed login gateway using `st.stop()` that prevents unauthorized rendering of administrative tools. Isolated accounts dynamically inject localized dashboards based on specific "Admin" vs "Teacher" allocations mapping straight to the dataset.
+- **Contextual AI Override for Deployment Logistics**: Upgraded the `geospatial_tracker` to perform contextual decision intelligence. It dynamically shifts high-priority operational targets (such as "BARMM") into focus when they fall within a 2.0% mathematical margin of the absolute highest fragility threshold.
+- **Lazy-Loaded ML Engines**: Strategically decoupled heavy neural-network imports (`torch`, `sentence_transformers`) from the main-level runtime. Modules now map to the PyTorch memory footprint exclusively during active execution, dropping UI module-switching latencies to zero.
+- **Data Pipeline Quality Gates**: Fortified the `ingestion` module with an interactive staging buffer. Deployed three-tier checkpoints preventing the ingestion of files with `< 500` rows or missing baseline systemic requirements.
+
+## Hackathon End-to-End Simulation Walkthrough
+
+To demo the comprehensive capability of the A.S.T.R.A framework to the judges, follow this standard operational sequence:
+
+### 1. Activating the Security Gateway
+1. Open the application. You will be intercepted entirely by the **Secure Authentication Gateway**.
+2. **Demo Admin Access:** Log in using `admin` / `dost2026`. This unlocks the high-level operational modules (Geospatial Map, Intelligence Hub).
+3. **Demo Localized Teacher Access:** Showcasing `2026-STAR-0003` / `fernandez123` demonstrates how the UI natively restructures around an isolated individual displaying localized "Career Skill-Trees".
+
+### 2. The Ingestion Engine (Automated Data Fusion)
+1. As the Admin, navigate to the **Ingestion Engine**.
+2. Address the problem: local operational CSVs often contain unstructured, messy Tagalog terminology. 
+3. Upload `STAR_Integrated_Data_Latest.csv` and trigger **Execute AI Fusion**.
+4. Demonstrate how the local Multilingual NLP dynamically aligns Tagalog variables (`guro`, `lugar`) into the strict data schema pipeline.
+5. Highlight the **Data Pipeline Quality Gates**: Explain how the engine stages data in memory first, verifying volume bounds (500+) and critical structural features before allowing you to **Confirm & Integrate**.
+
+### 3. Prescriptive Intelligence Engine (Analytics)
+1. Navigate to the **Intelligence Analytics** tab. 
+2. Point out the **National Fragility Average**. Explain the methodology where K-Means Machine Learning dynamically clusters the active grid into mathematical categories ("Novice Pool" vs "Core Tier").
+
+### 4. Deployment Logistics Map (Live Operations)
+1. Open the **Deployment Logistics Map**.
+2. Highlight the WebGL 3D PyDeck visualization of workforce densities. Select the **Underserved Hotspots (Out-of-Field)** toggle to instantly expose out-of-field teaching discrepancies.
+3. Observe the **AI Regional Suggestion** panel. Demonstrate its real-world system awareness (how the AI utilizes a "Contextual Override" flag to target strategically critical regions).
+4. Utilize the Simulation UI to deploy a specialized teacher from `Global Nearest` directly into an `AI Epicenter`. 
+5. Emphasize the live recalculation: Watch the UI draw dynamic transport routing arcs while the underlying Fragility Statistics recalculate themselves in real-time. Attempt an invalid extraction to demonstrate the **Cannibalization Block** safety limit!
+
+### 5. Individualized Teacher View (Localized UI)
+1. Hit **Logout** to kill the Admin session and simulate an individual employee logging into their private portal using `2026-STAR-0003` / `fernandez123`.
+2. Emphasize how the global UI instantly collapses down into specific, private metrics. 
+3. Navigate to **Career Skill-Tree (Analytics)**. Show the RPG-styled Plotly Radar Chart visually summarizing the logged-in teacher's exact capabilities against their regional mathematical cohort averages.
+4. Switch to **Local Ecosystem (Network)**. Demonstrate the PyVis graph rendering an isolated topological web, showing exactly who the individual teacher's localized "Veteran Legends" and mentees are strictly within their immediate jurisdiction.
 
 ## Methodology & Mathematical Formalization
 

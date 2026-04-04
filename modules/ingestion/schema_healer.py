@@ -1,11 +1,6 @@
 import pandas as pd
-import torch
 import re
-from sentence_transformers import SentenceTransformer, util
-from transformers import MarianTokenizer, MarianMTModel
 import streamlit as st
-from geopy.geocoders import Nominatim
-from geopy.extra.rate_limiter import RateLimiter
 from core.dataframe_schema import normalize_record_columns
 
 # Standard Lowercase Snake_Case Schema
@@ -29,6 +24,8 @@ TAGALOG_MAP = {
 
 @st.cache_resource
 def load_models():
+    from sentence_transformers import SentenceTransformer
+    from transformers import MarianTokenizer, MarianMTModel
     mapper = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
     model_name = "Helsinki-NLP/opus-mt-tl-en"
     tokenizer = MarianTokenizer.from_pretrained(model_name)
@@ -47,6 +44,7 @@ def sanitize_column_name(name):
     return name
 
 def translate_tagalog_to_english(text, tokenizer, model):
+    import torch
     try:
         clean_text = str(text).replace("_", " ").strip()
         inputs = tokenizer(clean_text.lower(), return_tensors="pt", padding=True)
@@ -57,6 +55,8 @@ def translate_tagalog_to_english(text, tokenizer, model):
         return text
 
 def ai_normalize_columns(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    import torch
+    from sentence_transformers import util
     mapper, tokenizer, model = load_models()
     original_cols = df.columns.tolist()
     target_embeddings = mapper.encode(TARGET_SCHEMA, convert_to_tensor=True)
@@ -120,6 +120,8 @@ def ai_normalize_columns(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     return df_clean, mapping
 
 def get_coordinates(df):
+    from geopy.geocoders import Nominatim
+    from geopy.extra.rate_limiter import RateLimiter
     geolocator = Nominatim(user_agent="positive_xp_requiem_dss")
     geocode = RateLimiter(geolocator.geocode, min_delay_seconds=0.8)
     # Note: Using lowercase 'region' now

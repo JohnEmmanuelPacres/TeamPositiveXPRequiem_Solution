@@ -1,6 +1,6 @@
 import streamlit as st
 from core.ui_components import set_page_config, inject_custom_css
-from core.auth import initialize_session, get_current_role, render_sidebar_auth
+from core.auth import initialize_session, get_current_role, render_sidebar_auth, render_login_page
 from core.data_loader import get_working_dataframe
 from core.dataframe_schema import normalize_record_columns
 
@@ -10,6 +10,12 @@ inject_custom_css()
 
 # Session Boot
 initialize_session()
+
+# --- AUTHENTICATION GATE ---
+if not st.session_state.get('authenticated', False):
+    render_login_page()
+    st.stop()
+
 role = get_current_role()
 
 # --- TIMELINE LOGIC (Merged from your teammate's update) ---
