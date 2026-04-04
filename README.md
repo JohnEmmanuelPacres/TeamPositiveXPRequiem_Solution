@@ -6,6 +6,16 @@ This project is a professional-grade predictive Decision Support System (DSS) de
 
 By unifying fragmented data, the **A.S.T.R.A** framework acts as a mathematical playbook for strategic resource allocation, leveraging **Prescriptive Intelligence** to heal educational vulnerabilities system-wide.
 
+## Table of Contents
+
+- [Hackathon Highlights & Core Features](#hackathon-highlights--core-features)
+- [Architecture Overview](#architecture-overview)
+- [Recent Updates & Optimizations](#recent-updates--optimizations)
+- [Methodology & Mathematical Formalization](#methodology--mathematical-formalization)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running the Dashboard](#running-the-dashboard)
+
 ## Hackathon Highlights & Core Features
 
 - **Longitudinal Timeframe Simulator (2022-2026):** Algorithmically reverse-engineers historical datasets using dynamic XP penalties to simulate programmatic ROI and Year-Over-Year (YoY) recovery metrics.
@@ -16,14 +26,46 @@ By unifying fragmented data, the **A.S.T.R.A** framework acts as a mathematical 
 
 ## Architecture Overview
 
-The system operates as a Modular Monolith in Python, running fully local to simulate high-end prescriptive analytics while guaranteeing performance on low-end hardware.
+The system operates as a **Modular Monolith** built entirely in Python via Streamlit. It runs fully local to execute high-end prescriptive analytics and Machine Learning models while ensuring strict data privacy and guaranteeing performance on standard agency hardware. State management is aggressively optimized using `@st.cache_data` and `@st.cache_resource` for near-instant execution of heavy Data Engineering and ML workflows.
 
-The platform is divided into Four Core Pillars:
+### The Technology Stack
 
-1. **Pillar 1: Geospatial Tracker**: Project NOAH-style 3D logistics and K-Means hub displacement maps.
-2. **Pillar 2: Ingestion Engine**: String normalization ('Schema Healer') utility mapped using `thefuzz[speedup]` to sanitize incoming datasets natively.
-3. **Pillar 3: Network Dashboard**: Interactive node topology representing organic knowledge-transfer graphs.
-4. **Pillar 4: Intelligence Hub**: Real-time math algorithms calculating local Fragility Scores and 2D Cohort Heatmaps for macro-admin oversight.
+- **Frontend / Application State:** Streamlit (Python UI), Plotly WebGL (`go.Scattergl`), PyVis, and PyDeck.
+- **Machine Learning & NLP:** HuggingFace `SentenceTransformers` (`paraphrase-multilingual-MiniLM-L12-v2`) and Helsinki-NLP's `MarianMTModel` for zero-shot Tagalog-to-English translations.
+- **Clustering & Data Science:** `scikit-learn` (K-Means), `numpy` (`np.polyfit` for longitudinal time series forecasting), and `pandas`.
+- **Topological Networking:** `NetworkX`, rendered via `pyvis` to model teacher-mentor ecosystems organically.
+
+### The Four Core Pillars
+
+1. **Geospatial Tracker (`modules/geospatial_tracker/`)**
+   - Functions as the primary logistics controller.
+   - Powered by `pydeck` to render Project NOAH-style 3D logistics and K-Means hub displacement maps.
+   - Algorithmically plans operational travel routes, directing experts from robust geographical hubs into under-indexed, fragile school epicenter zones.
+
+2. **Ingestion Engine (`modules/ingestion/`)**
+   - Serves as the automated "Schema Healer" and ETL pipeline.
+   - Leverages local PyTorch NLP models to conduct semantic column mapping and on-the-fly TAG-EN language translations.
+   - Instantly normalizes disparate, improperly formatted regional CSVs into the heavily standardized schema required by the tracking algorithms.
+
+3. **Network Dashboard (`modules/network_dashboard/`)**
+   - Focuses on the interactive node topology representing theoretical knowledge-transfer between regional educators.
+   - Utilizes graph math to isolate the "weakest links" in the local mentor-mentee framework, effectively mitigating the structural weakness caused by the "out-of-field teaching" deficit.
+
+4. **Intelligence Hub (`modules/intelligence/`)**
+   - Acts as the macro-admin surveillance suite.
+   - Runs deterministic real-time heuristics predicting local "Fragility Scores".
+   - Computes dynamic classification cohorts and projects an embedded 5-Year timeline simulation across high-density WebGL scatter layers.
+
+## Recent Updates & Optimizations
+
+To prepare for the final presentation and ensure a seamless, production-ready user experience, several core engine and UI optimizations were recently implemented:
+
+- **Mentorship Ecosystem Overhaul**: Upgraded the _Intelligence Hub_ with sleek UI metric cards and transitioned from standard Plotly overlays to GPU-accelerated **`go.Scattergl`**. This resolved browser lagging issues when visualizing dense cohort demographic scatter plots.
+- **Micro-Transition Caching**: Implemented Streamlit's `@st.cache_data` decorators across computationally expensive ML functions (`generate_cohorts`, `build_pyvis_graph`, `find_nearest_teacher`). Module-switching latency has been entirely eliminated, delivering near-instantaneous navigation.
+- **Geospatial Model Toggling**: Integrated dynamic UI controls (`st.radio`) directly into the Geospatial Tracker. Users can now seamlessly toggle map projections between the synthetic simulation dataset and live data piped from the AI Ingestion Engine.
+- **AI Model Initialization Feedbacks**: Wrapped HuggingFace model loading (`SentenceTransformer` and `MarianMTModel`) in `@st.cache_resource` with an asynchronous visual spinner. This informs users that semantic NLP models are booting into RAM during the first load of the Ingestion Engine, hiding the loading freeze.
+- **Defensive Data Forecasts**: Built exception-handling buffers around the longitudinal forecasting algorithm (`np.polyfit`) to prevent pipeline crashes when mapping array dimensions across incomplete data points.
+- **Dynamic Schema Normalization**: Upgraded the core DataFrame schema dictionary to strictly maintain `PascalCase` mappings where required, successfully fixing UI parsing errors (`KeyError: 'Cohort_Name'`) and automatically deduplicating table outputs.
 
 ## Methodology & Mathematical Formalization
 
