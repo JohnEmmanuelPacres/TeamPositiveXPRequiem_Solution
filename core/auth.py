@@ -27,8 +27,8 @@ def render_sidebar_auth():
 
 def render_login_page():
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align: center;'>STAR Decision Support System</h1>", unsafe_allow_html=True)
-    st.markdown("<h4 style='text-align: center; color: #888888;'>Secure Authentication Gateway</h4>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: center; font-size: 2.5em; font-weight: bold; margin-bottom: 0.5em;'>A.S.T.R.A</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: center; color: #888888; font-size: 1.25em; font-weight: bold;'>AI-driven Spatial Tracking and Resource Allocation System</div>", unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
