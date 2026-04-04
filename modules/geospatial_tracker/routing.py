@@ -13,7 +13,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     return math.sqrt((lat2 - lat1)**2 + (lon2 - lon1)**2)
 
 @st.cache_data
-def find_nearest_teacher(df: pd.DataFrame, target_lat, target_lon, subject=None) -> pd.DataFrame:
+def find_nearest_teacher(df: pd.DataFrame, target_lat, target_lon, subject=None, source_region=None) -> pd.DataFrame:
     """
     Filters the dataframe for nearest available highly-qualified mentors.
     It intentionally excludes vulnerable teachers to ensure we are deploying resources cleanly.
@@ -21,6 +21,9 @@ def find_nearest_teacher(df: pd.DataFrame, target_lat, target_lon, subject=None)
     df = normalize_record_columns(df, include_legacy_aliases=True)
     # Only deploy robust teachers who are actually teaching their correct majors
     work_df = df[df['fragility_indicator'] == 'Low'].copy()
+    
+    if source_region and source_region != "Global Nearest (Any)":
+        work_df = work_df[work_df["region"] == source_region]
     
     if subject:
         work_df = work_df[work_df["major_specialization"].str.contains(subject, case=False, na=False)]

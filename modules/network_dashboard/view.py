@@ -111,5 +111,44 @@ def render(df):
                 st.success("Simulation reset. Teachers returned to original regions.")
                 st.rerun()
 
+def render_teacher_view(df):
+    st.markdown("<div class='main-header'>Local Mentorship Ecosystem</div>", unsafe_allow_html=True)
+    st.markdown("<div class='sub-header'>A topological view of your immediate peers and accessible 'Veteran Legend' mentors.</div>", unsafe_allow_html=True)
 
+    teacher_region = st.selectbox("Your Operating Region:", list(REGION_COORDS.keys()))
+    regional_df = df[df['region'] == teacher_region].copy()
 
+    # Check for Inter-Regional Deployment Alerts
+    if 'regional_alerts' in st.session_state:
+        for alert in st.session_state['regional_alerts']:
+            if alert['region'] == teacher_region:
+                st.success(alert['message'], icon="🤝")
+
+    # Show quick stats
+    veteran_count = len(regional_df[regional_df['years_experience'] >= 15])
+    standard_count = len(regional_df) - veteran_count
+    
+    st.markdown(f"**Ecosystem Snapshot for {teacher_region}:** Discovered **{veteran_count}** Local Legends and **{standard_count}** Standard Nodes.")
+
+    # Teacher view receives a strictly localized ecosystem
+    with st.spinner("Rendering Private Network Topology..."):
+        html_data = build_pyvis_graph(regional_df, limit=35) 
+        components.html(html_data, height=520)
+        
+    # Display overflow professors that didn't fit in the 35 node limit
+    overflow_count = len(regional_df) - 35
+    if overflow_count > 0:
+        with st.expander(f"View {overflow_count} Additional Regional Peers (Hidden to preserve graph performance)"):
+            st.dataframe(regional_df.iloc[35:][["teacher_id", "first_name", "last_name", "major_specialization", "years_experience"]].reset_index(drop=True), use_container_width=True)
+        
+    # Graph Legend
+    legend_cols = st.columns([1, 1])
+    with legend_cols[0]:
+        st.markdown("**Node Types:**\n<ul style=\"list-style: none; padding-left: 0;\"><li>⭐ Star (Local Legend, 15+ Yrs Exp)</li><li>🔵 Circle (Standard)</li><li>🔴 Red Circle (Region Hub)</li></ul>", unsafe_allow_html=True)
+    with legend_cols[1]:
+        st.markdown("**Subjects Taught:**")
+        sub_cols = st.columns(2)
+        with sub_cols[0]:
+            st.markdown("<ul style=\"list-style: none; padding-left: 0;\"><li>🟦 Physics</li><li>🟩 Chemistry</li><li>🟧 Biology</li></ul>", unsafe_allow_html=True)
+        with sub_cols[1]:
+            st.markdown("<ul style=\"list-style: none; padding-left: 0;\"><li>🟪 Math</li><li>⬜ Gen Sci</li><li>⚪ Other</li></ul>", unsafe_allow_html=True)

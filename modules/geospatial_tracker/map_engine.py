@@ -29,6 +29,7 @@ def create_heatmap_layer(df: pd.DataFrame) -> pdk.Layer:
         extrude=True,
         coverage=1,
         color_range=COLOR_RANGE,
+        opacity=0.6,
     )
 
 def create_scatter_layer(df: pd.DataFrame) -> pdk.Layer:
@@ -56,11 +57,25 @@ def create_arc_layer(df: pd.DataFrame) -> pdk.Layer:
         get_width=6, # Thick glowing laser lines
         get_source_position=["source_lon", "source_lat"],
         get_target_position=["target_lon", "target_lat"],
-        get_tilt=15, # Angular tilt for a cool 3D vaulting effect
         get_source_color=[0, 255, 128, 200], # Neon Green Origin
         get_target_color=[255, 0, 64, 255], # Red Impact Zone
         pickable=True,
         auto_highlight=True,
+    )
+
+def create_region_labels_layer():
+    from core.data_loader import REGION_COORDS
+    region_data = [{"region": k, "longitude": v[1], "latitude": v[0]} for k, v in REGION_COORDS.items()]
+    return pdk.Layer(
+        "TextLayer",
+        data=pd.DataFrame(region_data),
+        get_position=["longitude", "latitude"],
+        get_text="region",
+        get_size=16,
+        get_color=[0, 0, 0, 200], # Dark text to contrast the carto bright map
+        get_background_color=[255, 255, 255, 150],
+        background=True,
+        get_alignment_baseline="'bottom'",
     )
 
 def render_map(df: pd.DataFrame, view_state=None, arcs_df: pd.DataFrame=None):
@@ -68,7 +83,6 @@ def render_map(df: pd.DataFrame, view_state=None, arcs_df: pd.DataFrame=None):
     Renders the pydeck map.
     """
     if view_state is None:
-        # Changed max_zoom to 20 so users can zoom in close enough to see 3D buildings.
         view_state = pdk.ViewState(
             longitude=122.56, 
             latitude=12.2, 
@@ -80,20 +94,42 @@ def render_map(df: pd.DataFrame, view_state=None, arcs_df: pd.DataFrame=None):
         )
     
     layers = [
+        create_region_labels_layer(),
         create_heatmap_layer(df),
         create_scatter_layer(df)
     ]
     
     if arcs_df is not None and not arcs_df.empty:
         layers.append(create_arc_layer(arcs_df))
+        
+    advanced_tooltip = {
+        "html": """
+            <style>
+                .prop-undefined { display: none !important; }
+                .prop-null { display: none !important; }
+                .prop-\\{elevationValue\\} { display: none !important; }
+                .prop-\\{first_name\\} { display: none !important; }
+                .prop-\\{region\\} { display: none !important; }
+                .prop-\\{teacher_name\\} { display: none !important; }
+                .prop-\\{route_info\\} { display: none !important; }
+                .val-box { margin-bottom: 2px; }
+            </style>
+            <div>
+                <div class='prop-{elevationValue} val-box'><b>Cluster Density:</b> {elevationValue} Teachers</div>
+                <div class='prop-{first_name} val-box'><b>Node:</b> {first_name} {last_name}</div>
+                <div class='prop-{region} val-box'><b>Region:</b> {region}</div>
+                <div class='prop-{teacher_name} val-box'><b>Deployed Tech:</b> {teacher_name}</div>
+                <div class='prop-{route_info} val-box'><b>Routing Protocol:</b> {route_info}</div>
+            </div>
+        """,
+        "style": {"backgroundColor": "#222222", "color": "white", "padding": "10px", "borderRadius": "5px"}
+    }
     
     r = pdk.Deck(
         layers=layers,
         initial_view_state=view_state,
-        tooltip={"html": "<b>Manpower Assessed:</b> {elevationValue} Teachers", "style": {"color": "white", "backgroundColor": "#222222"}},
-        # Switch to "carto" so it works automatically without any API keys! 
+        tooltip=advanced_tooltip,
         map_provider="carto", 
-        # "voyager" style is Carto's equivalent to Google Maps (roads, labels, light background)
         map_style="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
     )
     st.pydeck_chart(r)
