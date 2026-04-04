@@ -4,7 +4,7 @@ from core.ui_components import render_header
 from modules.ingestion.schema_healer import ai_normalize_columns, get_coordinates
 
 def render():
-    render_header("Pillar 2: Ingestion Engine", "Automated Semantic Data Fusion")
+    render_header("Ingestion Engine", "Automated Semantic Data Fusion")
     
     st.info("💡 **Hackathon Feature:** This engine uses Multilingual AI to map Tagalog headers and automatically translate unknown columns to English.")
 

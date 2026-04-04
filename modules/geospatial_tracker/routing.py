@@ -1,5 +1,6 @@
 import math
 import pandas as pd
+import streamlit as st
 from sklearn.cluster import KMeans
 from core.dataframe_schema import normalize_record_columns
 
@@ -11,6 +12,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     """
     return math.sqrt((lat2 - lat1)**2 + (lon2 - lon1)**2)
 
+@st.cache_data
 def find_nearest_teacher(df: pd.DataFrame, target_lat, target_lon, subject=None) -> pd.DataFrame:
     """
     Filters the dataframe for nearest available highly-qualified mentors.
@@ -34,6 +36,7 @@ def find_nearest_teacher(df: pd.DataFrame, target_lat, target_lon, subject=None)
     
     return work_df.sort_values(by="distance_from_target").head(5)
 
+@st.cache_data
 def find_teachers_from_top_clusters(df: pd.DataFrame, region: str, target_lat: float, target_lon: float, subject=None, n_clusters=5, top_n_clusters=3, teachers_per_cluster=2) -> pd.DataFrame:
     """
     Clusters highly-qualified teachers in a region to find the top populated areas,
