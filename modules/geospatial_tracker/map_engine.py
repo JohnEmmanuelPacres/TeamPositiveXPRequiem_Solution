@@ -1,6 +1,7 @@
 import pydeck as pdk
 import pandas as pd
 import streamlit as st
+from core.dataframe_schema import normalize_record_columns
 
 def create_heatmap_layer(df: pd.DataFrame) -> pdk.Layer:
     """
@@ -15,10 +16,11 @@ def create_heatmap_layer(df: pd.DataFrame) -> pdk.Layer:
         [189, 0, 38],
     ]
 
+    df = normalize_record_columns(df)
     return pdk.Layer(
         "HexagonLayer",
         data=df,
-        get_position=["Longitude", "Latitude"],
+        get_position=["longitude", "latitude"],
         auto_highlight=True,
         radius=1500, # Reduced to 1.5km to ensure data points roughly stay inland
         elevation_scale=100, # Balanced elevation relative to normal radius
@@ -33,10 +35,11 @@ def create_scatter_layer(df: pd.DataFrame) -> pdk.Layer:
     """
     Plots individual teachers as points.
     """
+    df = normalize_record_columns(df)
     return pdk.Layer(
         "ScatterplotLayer",
         data=df,
-        get_position=["Longitude", "Latitude"],
+        get_position=["longitude", "latitude"],
         get_color="[200, 30, 0, 160]",
         get_radius=200,
         pickable=True
@@ -46,12 +49,13 @@ def create_arc_layer(df: pd.DataFrame) -> pdk.Layer:
     """
     Draws dynamic neon arcs simulating dispatch routing vectors.
     """
+    df = normalize_record_columns(df)
     return pdk.Layer(
         "ArcLayer",
         data=df,
         get_width=6, # Thick glowing laser lines
-        get_source_position=["Source_Lon", "Source_Lat"],
-        get_target_position=["Target_Lon", "Target_Lat"],
+        get_source_position=["source_lon", "source_lat"],
+        get_target_position=["target_lon", "target_lat"],
         get_tilt=15, # Angular tilt for a cool 3D vaulting effect
         get_source_color=[0, 255, 128, 200], # Neon Green Origin
         get_target_color=[255, 0, 64, 255], # Red Impact Zone

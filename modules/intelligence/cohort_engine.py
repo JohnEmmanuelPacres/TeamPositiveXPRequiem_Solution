@@ -1,18 +1,19 @@
 import pandas as pd
 from sklearn.cluster import KMeans
+from core.dataframe_schema import normalize_record_columns
 
 def generate_cohorts(df: pd.DataFrame) -> pd.DataFrame:
     '''
     Uses K-Means clustering to identify dynamic talent pools based on Age and Experience.
     '''
-    work_df = df.copy()
+    work_df = normalize_record_columns(df, include_legacy_aliases=True)
     
     # Simple standardized feature matrix
-    X = work_df[["Age", "Years_Experience"]].fillna(0)
+    X = work_df[["age", "years_experience"]].fillna(0)
     
     # 3 Clusters: E.g., Rookies, Mid-Levels, Veterans
     kmeans = KMeans(n_clusters=3, random_state=42, n_init="auto")
-    work_df["Cohort_Cluster"] = kmeans.fit_predict(X)
+    work_df["cohort_cluster"] = kmeans.fit_predict(X)
     
     # Give colloquial names based on cluster centroids
     centroids = kmeans.cluster_centers_
@@ -24,5 +25,5 @@ def generate_cohorts(df: pd.DataFrame) -> pd.DataFrame:
     cluster_mapping[sorted_order[1]] = "Core Tier"
     cluster_mapping[sorted_order[2]] = "Veteran Legends"
     
-    work_df["Cohort_Name"] = work_df["Cohort_Cluster"].map(cluster_mapping)
-    return work_df
+    work_df["cohort_name"] = work_df["cohort_cluster"].map(cluster_mapping)
+    return normalize_record_columns(work_df, include_legacy_aliases=True)

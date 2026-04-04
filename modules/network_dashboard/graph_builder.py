@@ -2,26 +2,27 @@ import networkx as nx
 from pyvis.network import Network
 import pandas as pd
 import tempfile
+from core.dataframe_schema import normalize_record_columns
 
 def build_pyvis_graph(df: pd.DataFrame, limit: int = 150) -> str:
     """
     Builds a PyVis HTML graph. 
     Limits nodes for performance to emulate an 'Obsidian-like' Neural Map.
     """
-    work_df = df.head(min(limit, len(df)))
+    work_df = normalize_record_columns(df, include_legacy_aliases=True).head(min(limit, len(df)))
     
     G = nx.Graph()
     
     # Create Region Hubs
-    regions = work_df["Region"].unique()
+    regions = work_df["region"].unique()
     for reg in regions:
         G.add_node(reg, size=30, color="#FF4B4B", title=f"Region Hub: {reg}")
         
     # Create Teacher Nodes
     for _, row in work_df.iterrows():
-        t_id = row["Teacher_ID"]
-        reg = row["Region"]
-        subject = row["Major_Specialization"]
+        t_id = row["teacher_id"]
+        reg = row["region"]
+        subject = row["major_specialization"]
         
         # Color specific to subject for visual flair
         color_map = {
@@ -33,14 +34,14 @@ def build_pyvis_graph(df: pd.DataFrame, limit: int = 150) -> str:
         }
         node_color = color_map.get(subject, "#9CA3AF")
         
-        is_legend = row["Years_Experience"] >= 15
+        is_legend = row["years_experience"] >= 15
         node_shape = "star" if is_legend else "dot"
         node_size = 25 if is_legend else 15
         
         # Enhanced Tooltip/Title for better UX
-        years_exp = row["Years_Experience"]
-        first_name = row.get("First_Name", "")
-        last_name = row.get("Last_Name", "")
+        years_exp = row["years_experience"]
+        first_name = row.get("first_name", "")
+        last_name = row.get("last_name", "")
         prof_name = f"Prof. {first_name} {last_name}".strip() if first_name else "Unknown"
         
         label_title = f"{prof_name}\nID: {t_id}\n{subject}\n{years_exp} Yrs Exp"
