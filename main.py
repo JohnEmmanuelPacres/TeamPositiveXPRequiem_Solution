@@ -11,20 +11,29 @@ inject_custom_css()
 initialize_session()
 role = get_current_role()
 
-# Load Global Shared State
+# --- TIMELINE LOGIC (Merged from your teammate's update) ---
 if 'active_year' not in st.session_state:
     st.session_state['active_year'] = '2026'
 
 def transition_timeframe():
+    # Extracts the year (e.g., "2026") from the label
     new_year = st.session_state["year_radio_key"].split(" ")[0]
     st.session_state['active_year'] = new_year
+    # Reloads the global dataframe based on the year
     st.session_state['working_df'] = get_working_dataframe(new_year)
 
-# Sidebar Routing Logic
-render_sidebar_auth()
-st.sidebar.markdown("### Timeframe")
+# Load Global Shared State (if not already loaded)
+if 'working_df' not in st.session_state:
+    st.session_state['working_df'] = get_working_dataframe(st.session_state['active_year'])
 
-# Defined years with thematic labels
+# We pull from session_state so Pillar 2 (Ingestion) can update it live
+df = st.session_state['working_df']
+
+# Sidebar Authentication
+render_sidebar_auth()
+
+# --- SIDEBAR TIMELINE SELECTOR ---
+st.sidebar.markdown("### Timeframe")
 timeframes = {
     "2026": "2026 (Present AI Intervention)",
     "2025": "2025 (Initial Rollout Phase)",
@@ -34,7 +43,11 @@ timeframes = {
 }
 
 options_list = list(timeframes.values())
-default_index = list(timeframes.keys()).index(st.session_state['active_year'])
+# Find index of current active year to set as default
+try:
+    default_index = list(timeframes.keys()).index(st.session_state['active_year'])
+except ValueError:
+    default_index = 0
 
 st.sidebar.selectbox(
     "Select Timeline:", 
@@ -43,11 +56,6 @@ st.sidebar.selectbox(
     key="year_radio_key",
     on_change=transition_timeframe
 )
-
-if 'working_df' not in st.session_state:
-    st.session_state['working_df'] = get_working_dataframe(st.session_state['active_year'])
-
-df = st.session_state['working_df']
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Navigation")
@@ -97,7 +105,6 @@ else:
         st.markdown("<div class='main-header'>Local Ecosystem</div>", unsafe_allow_html=True)
         st.markdown("<div class='sub-header'>A view of peers and mentors within your network cluster.</div>", unsafe_allow_html=True)
         
-        # Teacher view receives a smaller scoped ecosystem
         html_data = build_pyvis_graph(df, limit=50) 
         components.html(html_data, height=500)
         
