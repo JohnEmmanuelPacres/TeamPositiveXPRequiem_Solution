@@ -38,7 +38,6 @@ def render(df):
                 risk_delta = 0
                 
         # J.A.R.V.I.S. Style AI Prescriptive Alert
-        feature/fix-calculation-intelligence
         novice_df = df_clustered[df_clustered['Cohort_Name'] == 'Novice Pool']
         novice_count = len(novice_df)
         target_region = novice_df['Region'].mode()[0] if not novice_df.empty else 'NCR'
