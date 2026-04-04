@@ -55,12 +55,13 @@ def render(df):
         
         st.markdown("---")
         
-        # 4 Visualization Tabs
-        tab1, tab2, tab3, tab4 = st.tabs([
+        # 5 Visualization Tabs
+        tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "Overview Dashboard",
             "Cohort Analysis",
             "Regional Heatmap",
-            "Mentorship Network"
+            "Mentorship Network",
+            "Longitudinal Forecast"
         ])
         
         # ============ TAB 1: Overview Dashboard ============
@@ -178,15 +179,160 @@ def render(df):
             novice_count = len(df_clustered[df_clustered['Cohort_Name'] == 'Novice Pool'])
             
             col_ment1, col_ment2, col_ment3 = st.columns(3)
-            col_ment1.markdown(f"<div class='metric-card'><div class='metric-label'>Veteran Legends</div><div class='metric-value'>{veteran_count}</div></div>", unsafe_allow_html=True)
-            col_ment2.markdown(f"<div class='metric-card'><div class='metric-label'>Core Tier</div><div class='metric-value'>{core_count}</div></div>", unsafe_allow_html=True)
-            col_ment3.markdown(f"<div class='metric-card'><div class='metric-label'>Novice Pool</div><div class='metric-value'>{novice_count}</div></div>", unsafe_allow_html=True)
+            col_ment1.markdown(f"<div class='metric-card' style='background-color:#1E293B; padding:15px; border-radius:8px; border-left:4px solid #10B981;'><div class='metric-label' style='color:#94A3B8;'>Veteran Legends</div><div class='metric-value' style='font-size:24px; color:#10B981; font-weight:bold;'>{veteran_count}</div></div>", unsafe_allow_html=True)
+            col_ment2.markdown(f"<div class='metric-card' style='background-color:#1E293B; padding:15px; border-radius:8px; border-left:4px solid #3B82F6;'><div class='metric-label' style='color:#94A3B8;'>Core Tier</div><div class='metric-value' style='font-size:24px; color:#3B82F6; font-weight:bold;'>{core_count}</div></div>", unsafe_allow_html=True)
+            col_ment3.markdown(f"<div class='metric-card' style='background-color:#1E293B; padding:15px; border-radius:8px; border-left:4px solid #F43F5E;'><div class='metric-label' style='color:#94A3B8;'>Novice Pool</div><div class='metric-value' style='font-size:24px; color:#F43F5E; font-weight:bold;'>{novice_count}</div></div>", unsafe_allow_html=True)
             
-            st.markdown("**Mentorship Match Capacity**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            col_m1, col_m2, col_m3 = st.columns(3)
+            
             if veteran_count > 0:
-                mentorship_ratio = round(core_count / veteran_count, 2) if veteran_count > 0 else 0
-                st.metric("Core Tier per Veteran Legend", f"{mentorship_ratio}:1", help="Mentorship scalability ratio")
-    
+                mentorship_ratio = round((core_count + novice_count) / veteran_count, 1)
+                col_m1.metric("System-wide Mentorship Burden", f"{mentorship_ratio}:1", help="Total Core+Novice per Veteran Legend")
+            else:
+                col_m1.metric("System-wide Mentorship Burden", "N/A", help="Total Core+Novice per Veteran Legend")
+                
+            out_of_field = len(df_clustered[df_clustered['Subject_Taught'] != df_clustered['Major_Specialization']])
+            oof_percent = round((out_of_field / len(df_clustered)) * 100, 1) if len(df_clustered) > 0 else 0
+            col_m2.metric("Out-of-Field Teachers", f"{out_of_field}", f"{oof_percent}% of Workforce", delta_color="inverse", help="Teachers not teaching their specialization")
+            
+            # Find the region with the worst Novice to Veteran ratio
+            region_ratios = {}
+            for reg in df_clustered['Region'].unique():
+                reg_df = df_clustered[df_clustered['Region'] == reg]
+                r_vet = len(reg_df[reg_df['Cohort_Name'] == 'Veteran Legends'])
+                r_nov = len(reg_df[reg_df['Cohort_Name'] == 'Novice Pool'])
+                if r_vet > 0:
+                    region_ratios[reg] = r_nov / r_vet
+                elif r_nov > 0:
+                    region_ratios[reg] = r_nov # Inflated if 0 veterans
+                    
+            if region_ratios:
+                worst_region = max(region_ratios, key=region_ratios.get)
+                worst_ratio = round(region_ratios[worst_region], 1)
+                col_m3.metric("Highest Mentorship Deficit", worst_region, f"{worst_ratio} Novices/Vet", delta_color="inverse", help="Region most in need of veteran deployments")
+            
+            st.markdown("---")
+            st.markdown("### Cohort Experience vs. Age Distribution")
+            
+            fig_scatter = go.Figure()
+            colors = {"Novice Pool": "#F43F5E", "Core Tier": "#3B82F6", "Veteran Legends": "#10B981"}
+            
+            for cohort_name, color in colors.items():
+                c_df = df_clustered[df_clustered['Cohort_Name'] == cohort_name]
+                if not c_df.empty:
+                    # Optimized by using Scattergl (WebGL rendering) instead of SVG Scatter
+                    fig_scatter.add_trace(go.Scattergl(
+                        x=c_df['Age'],
+                        y=c_df['Years_Experience'],
+                        mode='markers',
+                        name=cohort_name,
+                        marker=dict(color=color, size=6, opacity=0.6, line=dict(width=0.5, color='rgba(255,255,255,0.8)')),
+                        hovertext=c_df['Region'] + " - " + c_df['Subject_Taught'],
+                        hoverinfo='text+x+y+name'
+                    ))
+                    
+            fig_scatter.update_layout(
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(color='white'),
+                xaxis=dict(title="Teacher Age", gridcolor='rgba(255, 255, 255, 0.1)'),
+                yaxis=dict(title="Years of Experience", gridcolor='rgba(255, 255, 255, 0.1)'),
+                hovermode='closest'
+            )
+            st.plotly_chart(fig_scatter, use_container_width=True)
+        
+        # ============ TAB 5: Longitudinal Forecast ============
+        with tab5:
+            st.markdown("### Longitudinal Forecast (2022-2027 Projections)")
+            st.info("Analyzing historical fragility and capacity-building metrics to forecast 2027 trajectory using linear projection.")
+            
+            with st.spinner("Compiling Historical Telemetry..."):
+                import pandas as pd
+                import numpy as np
+                import plotly.graph_objects as go
+                
+                years = ['2022', '2023', '2024', '2025', '2026']
+                history_data = []
+                
+                # Fetch dataset versions iteratively
+                for y in years:
+                    try:
+                        y_df = get_working_dataframe(y)
+                        y_scored = append_fragility_scores(y_df)
+                        y_clustered = generate_cohorts(y_scored)
+                        
+                        history_data.append({
+                            'Year': int(y),
+                            'Fragility': int(y_scored['Calculated_Fragility_Score'].mean()),
+                            'Critical Nodes': len(y_scored[y_scored['Calculated_Fragility_Score'] > 75]),
+                            'Novice Count': len(y_clustered[y_clustered['Cohort_Name'] == 'Novice Pool'])
+                        })
+                    except Exception as e:
+                        pass
+                
+                if history_data:
+                    hist_df = pd.DataFrame(history_data)
+                    
+                    if len(hist_df) < 2:
+                        st.warning("Insufficient historical telemetry (requires at least 2 years of data) to generate 2027 projection.")
+                        has_forecast = False
+                    else:
+                        has_forecast = True
+                        # Linear projection for 2027
+                        x = hist_df['Year'].values
+                        forecast_year = 2027
+                        forecast_row = {'Year': forecast_year}
+                        
+                        for metric in ['Fragility', 'Critical Nodes', 'Novice Count']:
+                            y_vals = hist_df[metric].values
+                            # Fit 1-degree polynomial (linear regression)
+                            coeffs = np.polyfit(x, y_vals, 1)
+                            pred = int(round(np.polyval(coeffs, forecast_year)))
+                            # Ensure no negative projections
+                            forecast_row[metric] = max(0, pred) 
+                    
+                    fig_trend = go.Figure()
+                    
+                    colors = {'Fragility': '#FCD34D', 'Critical Nodes': '#F43F5E', 'Novice Count': '#3B82F6'}
+                    names = {'Fragility': 'Avg Fragility', 'Critical Nodes': 'Critical Risk Nodes', 'Novice Count': 'Novice Count'}
+                    
+                    for metric in ['Fragility', 'Critical Nodes', 'Novice Count']:
+                        # Historical Solid Line
+                        fig_trend.add_trace(go.Scatter(
+                            x=hist_df['Year'], y=hist_df[metric],
+                            mode='lines+markers',
+                            name=f"{names[metric]} (Actual)",
+                            line=dict(color=colors[metric], width=3),
+                            marker=dict(size=8)
+                        ))
+                        
+                        if has_forecast:
+                            # Projected 2027 Dashed Line
+                            last_year_val = hist_df.iloc[-1][metric]
+                            last_year = hist_df['Year'].max()
+                            fig_trend.add_trace(go.Scatter(
+                                x=[last_year, 2027], 
+                                y=[last_year_val, forecast_row[metric]],
+                                mode='lines+markers',
+                                name=f"{names[metric]} (Forecast)",
+                                line=dict(color=colors[metric], width=3, dash='dash'),
+                                marker=dict(size=8, symbol='star', color=colors[metric])
+                            ))
+                    
+                    fig_trend.update_layout(
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        font=dict(color='white'),
+                        xaxis=dict(title="Year Timeline", tickmode='linear', dtick=1),
+                        yaxis=dict(title="Calculated Volume / Score"),
+                        hovermode='x unified',
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                    )
+                    
+                    st.plotly_chart(fig_trend, use_container_width=True)
+                    st.caption("*Dashed lines represent probabilistic OLS linear projections based on baseline STAR programmatic ROI.*")
+
     else:
         # Teacher View
         render_header("Career Skill-Tree Matrix", "Your personal growth trajectory and local mentorship ecosystem.")
