@@ -6,8 +6,10 @@ from modules.intelligence.cohort_engine import generate_cohorts
 from modules.intelligence.mentor_matcher import find_mentors
 
 from core.data_loader import get_working_dataframe
+from core.dataframe_schema import normalize_record_columns
 
 def render(df):
+    df = normalize_record_columns(df)
     role = get_current_role()
     
     if role == "Admin":
@@ -25,19 +27,19 @@ def render(df):
             try:
                 prev_df = get_working_dataframe(prev_year)
                 prev_scored = append_fragility_scores(prev_df)
-                prev_avg_frag = int(prev_scored['Calculated_Fragility_Score'].mean())
-                prev_high_risk = len(prev_scored[prev_scored['Calculated_Fragility_Score'] > 75])
+                prev_avg_frag = int(prev_scored['calculated_fragility_score'].mean())
+                prev_high_risk = len(prev_scored[prev_scored['calculated_fragility_score'] > 75])
                 
                 # Deltas
-                frag_delta = int(df_scored['Calculated_Fragility_Score'].mean()) - prev_avg_frag
-                risk_delta = len(df_scored[df_scored['Calculated_Fragility_Score'] > 75]) - prev_high_risk
+                frag_delta = int(df_scored['calculated_fragility_score'].mean()) - prev_avg_frag
+                risk_delta = len(df_scored[df_scored['calculated_fragility_score'] > 75]) - prev_high_risk
             except FileNotFoundError:
                 frag_delta = 0
                 risk_delta = 0
                 
         # J.A.R.V.I.S. Style AI Prescriptive Alert
-        novice_count = len(df_clustered[df_clustered['Cohort_Name'] == 'Novice Pool'])
-        target_region = df_clustered['Region'].mode()[0] if not df_clustered.empty else 'NCR'
+        novice_count = len(df_clustered[df_clustered['cohort_name'] == 'Novice Pool'])
+        target_region = df_clustered['region'].mode()[0] if not df_clustered.empty else 'NCR'
         
         # Determine year-over-year context
         active_year = st.session_state.get('active_year', '2026')
@@ -69,8 +71,8 @@ def render(df):
             col1, col2, col3 = st.columns(3)
             
             nodes = len(df)
-            avg_frag = int(df_scored['Calculated_Fragility_Score'].mean())
-            high_risk = len(df_scored[df_scored['Calculated_Fragility_Score'] > 75])
+            avg_frag = int(df_scored['calculated_fragility_score'].mean())
+            high_risk = len(df_scored[df_scored['calculated_fragility_score'] > 75])
 
             col1.metric("Total Nodes Analyzed", f"{nodes}", delta_nodes)
             col2.metric("National Fragility Avg", f"{avg_frag}/100", delta_frag, delta_color="inverse")
@@ -78,7 +80,7 @@ def render(df):
             
             st.markdown("### Cohort Distribution")
             import plotly.graph_objects as go
-            cohort_counts = df_clustered['Cohort_Name'].value_counts()
+            cohort_counts = df_clustered['cohort_name'].value_counts()
             fig_dist = go.Figure(data=[
                 go.Bar(
                     x=cohort_counts.index,
@@ -106,13 +108,13 @@ def render(df):
             cohort_colors = {"Novice Pool": "#F43F5E", "Core Tier": "#3B82F6", "Veteran Legends": "#10B981"}
             
             for cohort_name, color in cohort_colors.items():
-                c_df = df_clustered[df_clustered['Cohort_Name'] == cohort_name]
+                c_df = df_clustered[df_clustered['cohort_name'] == cohort_name]
                 if c_df.empty: continue
                 
-                resilience = 100 - c_df['Calculated_Fragility_Score'].mean()
-                alignment = (c_df['Subject_Taught'] == c_df['Major_Specialization']).mean() * 100
-                xp_score = min(100, (c_df['Years_Experience'].mean() / 15) * 100)
-                mastery = min(100, max(0, ((c_df['Age'].mean() - 20) / 35) * 100))
+                resilience = 100 - c_df['calculated_fragility_score'].mean()
+                alignment = (c_df['subject_taught'] == c_df['major_specialization']).mean() * 100
+                xp_score = min(100, (c_df['years_experience'].mean() / 15) * 100)
+                mastery = min(100, max(0, ((c_df['age'].mean() - 20) / 35) * 100))
                 
                 r_values = [resilience, alignment, xp_score, mastery]
                 r_values.append(r_values[0])
@@ -142,7 +144,7 @@ def render(df):
             st.markdown("### Regional Cohort Density Heatmap")
             
             # Create a true 2D matrix: Region vs Cohort Count
-            heatmap_data = df_clustered.groupby(['Region', 'Cohort_Name']).size().unstack(fill_value=0)
+            heatmap_data = df_clustered.groupby(['region', 'cohort_name']).size().unstack(fill_value=0)
             
             # Sort by Novice Pool to bubble the most vulnerable regions to the top of the heatmap
             if 'Novice Pool' in heatmap_data.columns:
@@ -174,9 +176,9 @@ def render(df):
         with tab4:
             st.markdown("### Mentorship Ecosystem Overview")
             
-            veteran_count = len(df_clustered[df_clustered['Cohort_Name'] == 'Veteran Legends'])
-            core_count = len(df_clustered[df_clustered['Cohort_Name'] == 'Core Tier'])
-            novice_count = len(df_clustered[df_clustered['Cohort_Name'] == 'Novice Pool'])
+            veteran_count = len(df_clustered[df_clustered['cohort_name'] == 'Veteran Legends'])
+            core_count = len(df_clustered[df_clustered['cohort_name'] == 'Core Tier'])
+            novice_count = len(df_clustered[df_clustered['cohort_name'] == 'Novice Pool'])
             
             col_ment1, col_ment2, col_ment3 = st.columns(3)
             col_ment1.markdown(f"<div class='metric-card' style='background-color:#1E293B; padding:15px; border-radius:8px; border-left:4px solid #10B981;'><div class='metric-label' style='color:#94A3B8;'>Veteran Legends</div><div class='metric-value' style='font-size:24px; color:#10B981; font-weight:bold;'>{veteran_count}</div></div>", unsafe_allow_html=True)
@@ -367,18 +369,18 @@ def render(df):
                     _, mentor = row_data
                     
                     # Fetch Real Name or Default
-                    first_name = mentor.get('First_Name', '')
-                    last_name = mentor.get('Last_Name', '')
-                    name_display = f"Prof. {first_name} {last_name}" if first_name else mentor['Teacher_ID']
+                    first_name = mentor.get('first_name', '')
+                    last_name = mentor.get('last_name', '')
+                    name_display = f"Prof. {first_name} {last_name}" if first_name else mentor['teacher_id']
                     
                     with mentor_cols[i]:
                         st.markdown(f"""
                         <div style="background-color: #1E293B; padding: 15px; border-radius: 8px; border-left: 4px solid #10B981; margin-bottom: 20px;">
                             <h4 style="margin:0; color:#10B981;">{name_display}</h4>
-                            <p style="font-size: 0.85em; color: #94A3B8; margin-bottom: 10px;">ID: {mentor['Teacher_ID']}</p>
-                            <strong>Class:</strong> Level {min(5, int(mentor['Years_Experience']//5))} {mentor['Major_Specialization']} Master<br>
-                            <strong>XP:</strong> {mentor['Years_Experience']} Years Field Exp<br>
-                            <strong>Set:</strong> {mentor['Educational_Attainment']}<br>
+                            <p style="font-size: 0.85em; color: #94A3B8; margin-bottom: 10px;">ID: {mentor['teacher_id']}</p>
+                            <strong>Class:</strong> Level {min(5, int(mentor['years_experience']//5))} {mentor['major_specialization']} Master<br>
+                            <strong>XP:</strong> {mentor['years_experience']} Years Field Exp<br>
+                            <strong>Set:</strong> {mentor['educational_attainment']}<br>
                             <hr style="margin: 10px 0; border-color: #334155;">
                             <em style="font-size: 0.9em; color:#FCD34D;">Buff: Accelerates local capacity-building and mitigates {major} out-of-field fragility.</em>
                         </div>
@@ -399,7 +401,7 @@ def render(df):
                 user_values.append(user_values[0])
                 
                 # Mentor Stats
-                mentor_xp = top_mentor['Years_Experience']
+                mentor_xp = top_mentor['years_experience']
                 mentor_values = [100, min(100, (mentor_xp / 15) * 100), 95, min(100, 50 + (mentor_xp * 2))]
                 mentor_values.append(mentor_values[0])
                 
@@ -414,7 +416,7 @@ def render(df):
                     opacity=0.8
                 ))
                 
-                top_mentor_name = f"Prof. {top_mentor.get('First_Name', '')} {top_mentor.get('Last_Name', '')}" if top_mentor.get('First_Name', '') else top_mentor['Teacher_ID']
+                top_mentor_name = f"Prof. {top_mentor.get('first_name', '')} {top_mentor.get('last_name', '')}" if top_mentor.get('first_name', '') else top_mentor['teacher_id']
                 
                 fig.add_trace(go.Scatterpolar(
                     r=mentor_values,
@@ -438,7 +440,7 @@ def render(df):
                 # Expander for all remaining overflow matches
                 if len(mentors) > 3:
                     with st.expander(f"View Full Directory: {len(mentors) - 3} Other Applicable Mentors in {region}"):
-                        display_cols = ['Teacher_ID', 'First_Name', 'Last_Name', 'Years_Experience', 'Educational_Attainment']
+                        display_cols = ['teacher_id', 'first_name', 'last_name', 'years_experience', 'educational_attainment']
                         st.dataframe(mentors.iloc[3:][[c for c in display_cols if c in mentors.columns]].reset_index(drop=True), use_container_width=True)
             else:
                 st.warning("No high-experience mentors currently available in your node criteria. Try expanding your search to adjacent regions.")

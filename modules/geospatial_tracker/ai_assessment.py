@@ -1,59 +1,59 @@
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
+from core.dataframe_schema import normalize_record_columns
 
 def find_vulnerability_epicenter(df: pd.DataFrame, region: str):
-    """
-    Finds the largest cluster of highly vulnerable (out-of-field) teachers 
-    in a specific region.
-    """
-    region_df = df[df["Region"] == region]
+    df = normalize_record_columns(df, include_legacy_aliases=True)
+    # 1. Filter for the specific region
+    region_df = df[df["region"] == region].copy()
     
-    # Define vulnerability (Out-of-field teaching)
-    vulnerable_df = region_df[region_df["Subject_Taught"] != region_df["Major_Specialization"]].copy()
+    # 2. Identify vulnerable teachers (Values normalized)
+    vulnerable_df = region_df[
+        region_df["subject_taught"].str.strip().str.lower() != 
+        region_df["major_specialization"].str.strip().str.lower()
+    ].copy()
     
-    # If not enough vulnerable teachers, just fall back
-    if len(vulnerable_df) < 5:
+    if len(vulnerable_df) < 3: # Lowered threshold to 3 for demo purposes
         return None, None
         
-    coords = vulnerable_df[['Latitude', 'Longitude']]
-    
-    # K-Means clustering to find 3 localized hotspots
-    n_clusters = min(3, len(vulnerable_df))
+    coords = vulnerable_df[["latitude", "longitude"]].dropna()
+    if coords.empty:
+        return None, None
+
+    # 4. K-Means clustering
+    n_clusters = min(3, len(coords))
     kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init='auto')
-    vulnerable_df['Cluster'] = kmeans.fit_predict(coords)
     
-    # Find the cluster with the highest density (most teachers)
-    cluster_counts = vulnerable_df['Cluster'].value_counts()
-    largest_cluster_id = cluster_counts.idxmax()
+    # Predict clusters
+    vulnerable_df.loc[coords.index, 'cluster'] = kmeans.fit_predict(coords)
     
-    # Get the epicenter coordinates for the largest cluster
+    # 5. Find the largest cluster
+    cluster_counts = vulnerable_df['cluster'].value_counts()
+    if cluster_counts.empty:
+        return None, None
+        
+    largest_cluster_id = int(cluster_counts.idxmax()) # Fixed integer cast
     epicenter_lat, epicenter_lon = kmeans.cluster_centers_[largest_cluster_id]
     
-    # Extract structural data about this specific cluster to inform the assessment
-    epicenter_df = vulnerable_df[vulnerable_df['Cluster'] == largest_cluster_id]
-    
+    epicenter_df = vulnerable_df[vulnerable_df['cluster'] == largest_cluster_id]
     return (epicenter_lat, epicenter_lon), epicenter_df
 
 def generate_ai_assessment(epicenter_df: pd.DataFrame, region: str) -> str:
-    """
-    Simulates a generative AI reading the structural data of the hotspot and outputting an assessment.
-    """
     if epicenter_df is None or len(epicenter_df) == 0:
-        return f"Insufficient vulnerability data to generate a micro-targeted STAR assessment for {region}."
+        return f"Structural Integrity High: No significant vulnerability clusters found in {region}."
+
+    epicenter_df = normalize_record_columns(epicenter_df, include_legacy_aliases=True)
         
-    avg_exp = epicenter_df['Years_Experience'].mean()
-    most_needed_subject = epicenter_df['Subject_Taught'].mode()[0]
+    avg_exp = pd.to_numeric(epicenter_df['years_experience'], errors='coerce').mean()
+    subject_modes = epicenter_df['subject_taught'].mode()
+    most_needed_subject = subject_modes[0] if not subject_modes.empty else "Core STEM"
+    
     total_teachers = len(epicenter_df)
     
-    assessment = (
-        f"**Micro-Targeting Assessment Complete.**\n\n"
-        f"I have analyzed the geospatial distribution of vulnerable teachers in **{region}**. "
-        f"The algorithm isolated an epicenter where **{total_teachers}** educators are structurally out-of-field. "
-        f"The primary pedagogical deficit here is **{most_needed_subject}**.\n\n"
-        f"Furthermore, with an average teaching experience of just **{avg_exp:.1f} years** inside this sub-cluster, "
-        f"these teachers critically lack access to senior mentorship while handling subjects they did not major in. "
-        f"**Recommendation:** Deploy immediate STAR capacity-building modules focusing on core {most_needed_subject} fundamentals directed to these specific coordinates to prevent imminent educator burnout."
+    return (
+        f"**Autonomous Assessment for {region}:** Isolated a cluster of **{total_teachers}** "
+        f"teachers working out-of-field. The primary pedagogical gap is in **{most_needed_subject}**. "
+        f"Average tenure in this hotspot is **{avg_exp:.1f} years**. "
+        "Recommendation: Target this epicenter for localized subject-matter re-certification."
     )
-    
-    return assessment

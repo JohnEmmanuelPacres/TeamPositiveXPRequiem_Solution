@@ -6,6 +6,7 @@ from transformers import MarianTokenizer, MarianMTModel
 import streamlit as st
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
+from core.dataframe_schema import normalize_record_columns
 
 # Standard Lowercase Snake_Case Schema
 TARGET_SCHEMA = [
@@ -116,9 +117,10 @@ def ai_normalize_columns(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         if col not in df_clean.columns:
             df_clean[col] = "not_specified"
             
-    return df_clean, mapping
+    return normalize_record_columns(df_clean, include_legacy_aliases=True), mapping
 
 def get_coordinates(df):
+    df = normalize_record_columns(df, include_legacy_aliases=True)
     geolocator = Nominatim(user_agent="positive_xp_requiem_dss")
     geocode = RateLimiter(geolocator.geocode, min_delay_seconds=0.8)
     # Note: Using lowercase 'region' now

@@ -3,6 +3,7 @@ import numpy as np
 import streamlit as st
 
 import os
+from core.dataframe_schema import normalize_record_columns
 
 DATA_PATH = "Dataset/Data/STAR_Integrated_Data_Latest.csv"
 
@@ -11,18 +12,18 @@ def generate_historical_dataset(year: str):
     Reverse-engineers realistic past datasets by degrading the current data 
     (lowering experience, increasing 'out-of-field' teaching to simulate the crisis).
     """
-    base_df = pd.read_csv(DATA_PATH)
+    base_df = normalize_record_columns(pd.read_csv(DATA_PATH), include_legacy_aliases=False)
     years_back = 2026 - int(year)
     
     np.random.seed(int(year))
     # Degrade Experience and Age with random penalties to simulate non-uniform progression
     # The further back in time, the wider the variance of experience loss, padding the Novice pool
     random_xp_penalty = np.random.randint(0, 3 + (years_back * 2), size=len(base_df))
-    base_df['Years_Experience'] = base_df['Years_Experience'] - years_back - random_xp_penalty
-    base_df['Years_Experience'] = base_df['Years_Experience'].apply(lambda x: max(0, x))
+    base_df['years_experience'] = base_df['years_experience'] - years_back - random_xp_penalty
+    base_df['years_experience'] = base_df['years_experience'].apply(lambda x: max(0, x))
     
-    base_df['Age'] = base_df['Age'] - years_back
-    base_df['Age'] = base_df['Age'].apply(lambda x: max(20, x))
+    base_df['age'] = base_df['age'] - years_back
+    base_df['age'] = base_df['age'].apply(lambda x: max(20, x))
     
     # Scramble specializations to simulate "out-of-field" mismatches prior to STAR program
     mismatch_percent = 0.08 * years_back # 8% worse mismatch per year back
@@ -31,8 +32,8 @@ def generate_historical_dataset(year: str):
     # Randomly assign a non-matching subject to simulate out-of-field
     indices_to_mismatch = np.random.choice(base_df.index, size=mismatch_count, replace=False)
     for i in indices_to_mismatch:
-        base_df.loc[i, 'Major_Specialization'] = "Unrelated / Not Specified"
-        base_df.loc[i, 'Fragility_Indicator'] = "High"
+        base_df.loc[i, 'major_specialization'] = "Unrelated / Not Specified"
+        base_df.loc[i, 'fragility_indicator'] = "High"
 
     path = f"Dataset/Data/STAR_Integrated_Data_{year}.csv"
     base_df.to_csv(path, index=False)
@@ -72,7 +73,7 @@ def load_and_prepare_data(year="2026") -> pd.DataFrame:
         if not os.path.exists(path):
             path = generate_historical_dataset(year)
             
-    df = pd.read_csv(path)
+    df = normalize_record_columns(pd.read_csv(path), include_legacy_aliases=True)
     
     # Map coordinates
     def get_lat(region):
@@ -81,20 +82,20 @@ def load_and_prepare_data(year="2026") -> pd.DataFrame:
     def get_lon(region):
         return REGION_COORDS.get(region, (12.8797, 121.7740))[1]
         
-    df['Latitude'] = df['Region'].apply(get_lat)
-    df['Longitude'] = df['Region'].apply(get_lon)
+    df['latitude'] = df['region'].apply(get_lat)
+    df['longitude'] = df['region'].apply(get_lon)
     
     # Apply a very tight realistic jitter for Map visualization
     # Increased to 0.05 dev for realistic scattering while staying safely inland
     jitter_lat = np.random.normal(0, 0.05, size=len(df))
     jitter_lon = np.random.normal(0, 0.05, size=len(df))
     
-    df['Latitude'] = df['Latitude'] + jitter_lat
-    df['Longitude'] = df['Longitude'] + jitter_lon
-    
-    return df
+    df['latitude'] = df['latitude'] + jitter_lat
+    df['longitude'] = df['longitude'] + jitter_lon
+
+    return normalize_record_columns(df, include_legacy_aliases=True)
 
 # For caching the simulator modifications rapidly
 @st.cache_data
 def get_working_dataframe(year="2026"):
-    return load_and_prepare_data(year).copy()
+    return normalize_record_columns(load_and_prepare_data(year).copy(), include_legacy_aliases=True)
