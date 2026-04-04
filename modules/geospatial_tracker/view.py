@@ -17,7 +17,7 @@ def render(df):
     render_header("Deployment Logistics Map", "Geospatial deployment and vulnerability tracking.")
 
     # --- 1. SELF-HEALING & NORMALIZATION ---
-    df_internal = normalize_record_columns(df, include_legacy_aliases=True)
+    df_internal = normalize_record_columns(df)
 
     # Ensure mandatory columns exist
     for target_col in ["subject_taught", "major_specialization", "region", "teacher_id", "years_experience"]:
@@ -39,15 +39,6 @@ def render(df):
             df_internal['major_specialization'].str.strip().str.lower()
         ].copy()
     
-    # --- 3. FIX: MAP ENGINE COMPATIBILITY ---
-    # We force 'Latitude' and 'Longitude' to exist because the Map Engine (PyDeck) needs them
-    if 'latitude' in map_df.columns:
-        map_df['Latitude'] = map_df['latitude']
-        map_df['Longitude'] = map_df['longitude']
-    elif 'Latitude' in map_df.columns:
-        map_df['latitude'] = map_df['Latitude']
-        map_df['longitude'] = map_df['Longitude']
-
     # Now pass it to the actual engine
     render_map(map_df, arcs_df=st.session_state.get('routing_arcs_df'))
     
@@ -108,12 +99,12 @@ def render(df):
             # Construct Arc Data
             arcs_data = []
             for _, row in results.iterrows():
-                s_lat = row.get("latitude") or row.get("Latitude")
-                s_lon = row.get("longitude") or row.get("Longitude")
+                s_lat = row.get("latitude")
+                s_lon = row.get("longitude")
                 if s_lat and s_lon:
                     arcs_data.append({
-                        "Source_Lon": s_lon, "Source_Lat": s_lat,
-                        "Target_Lon": target_lon, "Target_Lat": target_lat
+                        "source_lon": s_lon, "source_lat": s_lat,
+                        "target_lon": target_lon, "target_lat": target_lat
                     })
             
             st.session_state['routing_arcs_df'] = pd.DataFrame(arcs_data)
@@ -124,7 +115,7 @@ def render(df):
     if st.session_state.get('dispatch_results') is not None:
         st.success(st.session_state['dispatch_msg'])
         for _, row in st.session_state['dispatch_results'].iterrows():
-            t_id = row.get('teacher_id') or row.get('Teacher_ID') or 'Unknown'
+            t_id = row.get('teacher_id') or 'Unknown'
             exp = row.get('years_experience') or 0
             spec = row.get('major_specialization') or 'N/A'
             st.markdown(f"**{t_id}** | Spec: **{spec}** | Exp: {exp} yrs")

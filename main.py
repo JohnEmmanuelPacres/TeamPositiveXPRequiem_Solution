@@ -28,7 +28,7 @@ if 'working_df' not in st.session_state:
     st.session_state['working_df'] = get_working_dataframe(st.session_state['active_year'])
 
 # We pull from session_state so Pillar 2 (Ingestion) can update it live
-df = normalize_record_columns(st.session_state['working_df'], include_legacy_aliases=True)
+df = normalize_record_columns(st.session_state['working_df'])
 st.session_state['working_df'] = df
 
 # Sidebar Authentication
@@ -111,7 +111,7 @@ else:
         st.markdown("<div class='sub-header'>A topological view of your immediate peers and accessible 'Veteran Legend' mentors.</div>", unsafe_allow_html=True)
 
         teacher_region = st.selectbox("Your Operating Region:", list(REGION_COORDS.keys()))
-        regional_df = df[df['Region'] == teacher_region].copy()
+        regional_df = df[df['region'] == teacher_region].copy()
 
         # Check for Inter-Regional Deployment Alerts
         if 'regional_alerts' in st.session_state:
@@ -120,7 +120,7 @@ else:
                     st.success(alert['message'], icon="🤝")
 
         # Show quick stats
-        veteran_count = len(regional_df[regional_df['Years_Experience'] >= 15])
+        veteran_count = len(regional_df[regional_df['years_experience'] >= 15])
         standard_count = len(regional_df) - veteran_count
         
         st.markdown(f"**Ecosystem Snapshot for {teacher_region}:** Discovered **{veteran_count}** Local Legends and **{standard_count}** Standard Nodes.")
@@ -134,7 +134,7 @@ else:
         overflow_count = len(regional_df) - 35
         if overflow_count > 0:
             with st.expander(f"View {overflow_count} Additional Regional Peers (Hidden to preserve graph performance)"):
-                st.dataframe(regional_df.iloc[35:][["Teacher_ID", "First_Name", "Last_Name", "Major_Specialization", "Years_Experience"]].reset_index(drop=True), use_container_width=True)
+                st.dataframe(regional_df.iloc[35:][["teacher_id", "first_name", "last_name", "major_specialization", "years_experience"]].reset_index(drop=True), use_container_width=True)
             
         # Graph Legend
         legend_cols = st.columns([1, 1])

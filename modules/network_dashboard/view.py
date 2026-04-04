@@ -7,7 +7,7 @@ from core.data_loader import REGION_COORDS
 from core.dataframe_schema import normalize_record_columns
 
 def render(df):
-    df = normalize_record_columns(df, include_legacy_aliases=True)
+    df = normalize_record_columns(df)
     render_header("Obsidian Mentorship Topology", "Interactive mapping of localized teaching resources.")
     
     col1, col2 = st.columns([3, 1])
@@ -29,7 +29,7 @@ def render(df):
             working_df = df
             node_limit = 150 # Global limit to avoid browser crash
         else:
-            working_df = df[df['Region'] == target_region]
+            working_df = df[df['region'] == target_region]
             node_limit = 35 # Localized limit to match Teacher view perfectly
             
         with st.spinner("Rendering Physics Sandbox..."):
@@ -40,7 +40,7 @@ def render(df):
         overflow_count = len(working_df) - node_limit
         if overflow_count > 0:
             with st.expander(f"View {overflow_count} Additional Teachers (Hidden due to Node Density Limits)"):
-                st.dataframe(working_df.iloc[node_limit:][["Teacher_ID", "First_Name", "Last_Name", "Region", "Major_Specialization", "Years_Experience"]].reset_index(drop=True), use_container_width=True)
+                st.dataframe(working_df.iloc[node_limit:][["teacher_id", "first_name", "last_name", "region", "major_specialization", "years_experience"]].reset_index(drop=True), use_container_width=True)
 
         # Legend below graph, horizontally compressed to avoid scrollbars
         legend_cols = st.columns([1, 1])
@@ -64,18 +64,18 @@ def render(df):
             st.warning("No teacher data available for simulation.")
         else:
             # Create a speedy lookup dictionary so the global dropdown doesn't lag
-            teacher_records = df.set_index("Teacher_ID").to_dict("index")
+            teacher_records = df.set_index("teacher_id").to_dict("index")
             def format_teacher_label(tid):
                 row = teacher_records[tid]
-                first = row.get("First_Name", "")
-                last = row.get("Last_Name", "")
+                first = row.get("first_name", "")
+                last = row.get("last_name", "")
                 name_prefix = f"Prof. {first} {last}".strip()
                 name_display = f"{name_prefix} | " if name_prefix else ""
-                return f"{name_display}{tid} | Current: {row['Region']} | {row['Years_Experience']} Yrs"
+                return f"{name_display}{tid} | Current: {row['region']} | {row['years_experience']} Yrs"
             
             teacher_id = st.selectbox(
                 "Select Global Teacher Node to Extract & Reassign", 
-                options=df["Teacher_ID"].tolist(),
+                options=df["teacher_id"].tolist(),
                 format_func=format_teacher_label
             )
 
@@ -90,13 +90,13 @@ def render(df):
                 if 'regional_alerts' not in st.session_state:
                     st.session_state['regional_alerts'] = []
                 
-                row = df[df["Teacher_ID"] == teacher_id].iloc[0]
-                prof_name = f"Prof. {row.get('First_Name', '')} {row.get('Last_Name', '')}".strip()
+                row = df[df["teacher_id"] == teacher_id].iloc[0]
+                prof_name = f"Prof. {row.get('first_name', '')} {row.get('last_name', '')}".strip()
                 prof_name = prof_name if prof_name != "Prof." else teacher_id
                 
                 st.session_state['regional_alerts'].append({
                     "region": new_region,
-                    "message": f"**INCOMING ALLY:** {prof_name} ({row['Years_Experience']} Yrs Exp, {row['Major_Specialization']}) has just been re-routed to the {new_region} ecosystem to assist with localized capacity building!"
+                    "message": f"**INCOMING ALLY:** {prof_name} ({row['years_experience']} Yrs Exp, {row['major_specialization']}) has just been re-routed to the {new_region} ecosystem to assist with localized capacity building!"
                 })
                 
                 st.success(f"Successfully deployed {teacher_id} to {new_region}. Metrics recalculated.")

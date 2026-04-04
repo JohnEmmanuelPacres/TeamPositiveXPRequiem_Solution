@@ -26,17 +26,17 @@ def find_vulnerability_epicenter(df: pd.DataFrame, region: str):
     kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init='auto')
     
     # Predict clusters
-    vulnerable_df.loc[coords.index, 'Cluster'] = kmeans.fit_predict(coords)
+    vulnerable_df.loc[coords.index, 'cluster'] = kmeans.fit_predict(coords)
     
     # 5. Find the largest cluster
-    cluster_counts = vulnerable_df['Cluster'].value_counts()
+    cluster_counts = vulnerable_df['cluster'].value_counts()
     if cluster_counts.empty:
         return None, None
         
     largest_cluster_id = int(cluster_counts.idxmax()) # Fixed integer cast
     epicenter_lat, epicenter_lon = kmeans.cluster_centers_[largest_cluster_id]
     
-    epicenter_df = vulnerable_df[vulnerable_df['Cluster'] == largest_cluster_id]
+    epicenter_df = vulnerable_df[vulnerable_df['cluster'] == largest_cluster_id]
     return (epicenter_lat, epicenter_lon), epicenter_df
 
 def generate_ai_assessment(epicenter_df: pd.DataFrame, region: str) -> str:
