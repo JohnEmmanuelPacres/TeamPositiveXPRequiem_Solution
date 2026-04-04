@@ -111,6 +111,12 @@ else:
         teacher_region = st.selectbox("Your Operating Region:", list(REGION_COORDS.keys()))
         regional_df = df[df['Region'] == teacher_region].copy()
 
+        # Check for Inter-Regional Deployment Alerts
+        if 'regional_alerts' in st.session_state:
+            for alert in st.session_state['regional_alerts']:
+                if alert['region'] == teacher_region:
+                    st.success(alert['message'], icon="🤝")
+
         # Show quick stats
         veteran_count = len(regional_df[regional_df['Years_Experience'] >= 15])
         standard_count = len(regional_df) - veteran_count
