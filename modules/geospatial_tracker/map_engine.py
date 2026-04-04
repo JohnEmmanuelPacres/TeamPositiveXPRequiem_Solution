@@ -1,6 +1,7 @@
 import pydeck as pdk
 import pandas as pd
 import streamlit as st
+from core.dataframe_schema import normalize_record_columns
 
 def create_heatmap_layer(df: pd.DataFrame) -> pdk.Layer:
     """
@@ -15,6 +16,7 @@ def create_heatmap_layer(df: pd.DataFrame) -> pdk.Layer:
         [189, 0, 38],
     ]
 
+    df = normalize_record_columns(df, include_legacy_aliases=True)
     return pdk.Layer(
         "HexagonLayer",
         data=df,
@@ -33,6 +35,7 @@ def create_scatter_layer(df: pd.DataFrame) -> pdk.Layer:
     """
     Plots individual teachers as points.
     """
+    df = normalize_record_columns(df, include_legacy_aliases=True)
     return pdk.Layer(
         "ScatterplotLayer",
         data=df,
@@ -46,6 +49,7 @@ def create_arc_layer(df: pd.DataFrame) -> pdk.Layer:
     """
     Draws dynamic neon arcs simulating dispatch routing vectors.
     """
+    df = normalize_record_columns(df, include_legacy_aliases=True)
     return pdk.Layer(
         "ArcLayer",
         data=df,

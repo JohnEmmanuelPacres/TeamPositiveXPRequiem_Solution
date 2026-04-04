@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
+from core.dataframe_schema import normalize_record_columns
 
 def find_vulnerability_epicenter(df: pd.DataFrame, region: str):
+    df = normalize_record_columns(df, include_legacy_aliases=True)
     # 1. Filter for the specific region
     region_df = df[df["region"] == region].copy()
     
@@ -15,11 +17,7 @@ def find_vulnerability_epicenter(df: pd.DataFrame, region: str):
     if len(vulnerable_df) < 3: # Lowered threshold to 3 for demo purposes
         return None, None
         
-    # 3. Handle coordinate column casing
-    lat_col = 'latitude' if 'latitude' in vulnerable_df.columns else 'Latitude'
-    lon_col = 'longitude' if 'longitude' in vulnerable_df.columns else 'Longitude'
-    
-    coords = vulnerable_df[[lat_col, lon_col]].dropna()
+    coords = vulnerable_df[["latitude", "longitude"]].dropna()
     if coords.empty:
         return None, None
 
@@ -44,6 +42,8 @@ def find_vulnerability_epicenter(df: pd.DataFrame, region: str):
 def generate_ai_assessment(epicenter_df: pd.DataFrame, region: str) -> str:
     if epicenter_df is None or len(epicenter_df) == 0:
         return f"Structural Integrity High: No significant vulnerability clusters found in {region}."
+
+    epicenter_df = normalize_record_columns(epicenter_df, include_legacy_aliases=True)
         
     avg_exp = pd.to_numeric(epicenter_df['years_experience'], errors='coerce').mean()
     subject_modes = epicenter_df['subject_taught'].mode()

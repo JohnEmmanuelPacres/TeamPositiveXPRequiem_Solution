@@ -6,8 +6,10 @@ from modules.intelligence.cohort_engine import generate_cohorts
 from modules.intelligence.mentor_matcher import find_mentors
 
 from core.data_loader import get_working_dataframe
+from core.dataframe_schema import normalize_record_columns
 
 def render(df):
+    df = normalize_record_columns(df, include_legacy_aliases=True)
     role = get_current_role()
     
     if role == "Admin":

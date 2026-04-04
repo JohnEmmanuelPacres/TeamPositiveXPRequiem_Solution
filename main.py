@@ -2,6 +2,7 @@ import streamlit as st
 from core.ui_components import set_page_config, inject_custom_css
 from core.auth import initialize_session, get_current_role, render_sidebar_auth
 from core.data_loader import get_working_dataframe
+from core.dataframe_schema import normalize_record_columns
 
 # Page Setup
 set_page_config()
@@ -27,7 +28,8 @@ if 'working_df' not in st.session_state:
     st.session_state['working_df'] = get_working_dataframe(st.session_state['active_year'])
 
 # We pull from session_state so Pillar 2 (Ingestion) can update it live
-df = st.session_state['working_df']
+df = normalize_record_columns(st.session_state['working_df'], include_legacy_aliases=True)
+st.session_state['working_df'] = df
 
 # Sidebar Authentication
 render_sidebar_auth()

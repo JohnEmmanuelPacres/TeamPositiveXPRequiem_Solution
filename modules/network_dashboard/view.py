@@ -4,8 +4,10 @@ from core.ui_components import render_header
 from modules.network_dashboard.graph_builder import build_pyvis_graph
 from modules.network_dashboard.simulator import deploy_teacher
 from core.data_loader import REGION_COORDS
+from core.dataframe_schema import normalize_record_columns
 
 def render(df):
+    df = normalize_record_columns(df, include_legacy_aliases=True)
     render_header("Obsidian Mentorship Topology", "Interactive mapping of localized teaching resources.")
     
     col1, col2 = st.columns([3, 1])

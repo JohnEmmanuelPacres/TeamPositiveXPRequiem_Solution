@@ -6,6 +6,7 @@ from modules.geospatial_tracker.map_engine import render_map
 from modules.geospatial_tracker.routing import find_nearest_teacher
 from core.data_loader import REGION_COORDS
 from modules.geospatial_tracker.ai_assessment import find_vulnerability_epicenter, generate_ai_assessment
+from core.dataframe_schema import normalize_record_columns
 
 def render(df):
     if 'routing_arcs_df' not in st.session_state:
@@ -16,8 +17,7 @@ def render(df):
     render_header("Deployment Logistics Map", "Geospatial deployment and vulnerability tracking.")
 
     # --- 1. SELF-HEALING & NORMALIZATION ---
-    df_internal = df.copy()
-    df_internal.columns = [c.lower() for c in df_internal.columns]
+    df_internal = normalize_record_columns(df, include_legacy_aliases=True)
 
     # Ensure mandatory columns exist
     for target_col in ["subject_taught", "major_specialization", "region", "teacher_id", "years_experience"]:
