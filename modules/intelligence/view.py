@@ -36,8 +36,9 @@ def render(df):
                 risk_delta = 0
                 
         # J.A.R.V.I.S. Style AI Prescriptive Alert
-        novice_count = len(df_clustered[df_clustered['Cohort_Name'] == 'Novice Pool'])
-        target_region = df_clustered['Region'].mode()[0] if not df_clustered.empty else 'NCR'
+        novice_df = df_clustered[df_clustered['Cohort_Name'] == 'Novice Pool']
+        novice_count = len(novice_df)
+        target_region = novice_df['Region'].mode()[0] if not novice_df.empty else 'NCR'
         
         # Determine year-over-year context
         active_year = st.session_state.get('active_year', '2026')
