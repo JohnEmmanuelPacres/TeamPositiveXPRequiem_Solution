@@ -2,6 +2,12 @@ streamlit
 pandas
 numpy
 thefuzz[speedup]
+sentence-transformers
+transformers
+sacremoses
+sentencepiece
+torch
+geopy
 networkx
 scikit-learn
 pydeck
