@@ -193,28 +193,106 @@ def render(df):
         st.markdown("---")
         
         st.subheader("Mentorship Matcher")
-        st.info("Based on your Region (e.g., NCR) and Major (e.g., Physics), we identify 'Local Legends' who have >12 years of specialized field experience to guide you.")
+        st.info("Based on your Region and Major, we identify 'Local Legends' who have >12 years of specialized field experience to guide you.")
         
         from core.data_loader import REGION_COORDS
-        col1, col2 = st.columns(2)
+        import plotly.graph_objects as go
+        
+        col1, col2, col3 = st.columns(3)
         with col1:
             region = st.selectbox("Your Region", list(REGION_COORDS.keys()))
         with col2:
             major = st.selectbox("Your Specialization", ["Physics", "Chemistry", "Biology", "Mathematics", "General Science"])
+        with col3:
+            current_xp = st.number_input("Your Current XP (Years)", min_value=0, max_value=40, value=2)
             
         if st.button("Find Local Mentors"):
             with st.spinner("Assembling Capacity-Building Cohort..."):
                 mentors = find_mentors(df, region, major)
                 
             if len(mentors) > 0:
-                st.success(f"Match Found! Discovered {len(mentors)} 'Local Legends'!")
-                for _, mentor in mentors.head(3).iterrows():
-                    st.info(f"""
-**[Local Legend] {mentor['Teacher_ID']}**
-* **Class:** Level 3 {mentor['Major_Specialization']} Master
-* **Base Set:** {mentor['Educational_Attainment']}
-* **XP:** {mentor['Years_Experience']} Years in the Field
-* **Buff:** *Accelerates local capacity-building and mitigates {major} subject out-of-field fragility.*
-""", icon="🛡️")
+                st.success(f"Match Found! Discovered {len(mentors)} 'Local Legends' in {region} specializing in {major}.")
+                
+                # Show top 3 in side-by-side graphical columns
+                st.markdown("### Top 3 Recommended Mentors")
+                mentor_cols = st.columns(len(mentors.head(3)))
+                
+                for i, row_data in enumerate(mentors.head(3).iterrows()):
+                    _, mentor = row_data
+                    
+                    # Fetch Real Name or Default
+                    first_name = mentor.get('First_Name', '')
+                    last_name = mentor.get('Last_Name', '')
+                    name_display = f"Prof. {first_name} {last_name}" if first_name else mentor['Teacher_ID']
+                    
+                    with mentor_cols[i]:
+                        st.markdown(f"""
+                        <div style="background-color: #1E293B; padding: 15px; border-radius: 8px; border-left: 4px solid #10B981; margin-bottom: 20px;">
+                            <h4 style="margin:0; color:#10B981;">{name_display}</h4>
+                            <p style="font-size: 0.85em; color: #94A3B8; margin-bottom: 10px;">ID: {mentor['Teacher_ID']}</p>
+                            <strong>Class:</strong> Level {min(5, int(mentor['Years_Experience']//5))} {mentor['Major_Specialization']} Master<br>
+                            <strong>XP:</strong> {mentor['Years_Experience']} Years Field Exp<br>
+                            <strong>Set:</strong> {mentor['Educational_Attainment']}<br>
+                            <hr style="margin: 10px 0; border-color: #334155;">
+                            <em style="font-size: 0.9em; color:#FCD34D;">Buff: Accelerates local capacity-building and mitigates {major} out-of-field fragility.</em>
+                        </div>
+                        """, unsafe_allow_html=True)
+                
+                # Add Radar Chart for comparison against the #1 Mentor
+                st.markdown("---")
+                st.markdown("### Skill-Tree Compatibility (You vs. Top Mentor)")
+                
+                top_mentor = mentors.iloc[0]
+                categories = ['Subject Alignment', 'Mentorship XP', 'Resilience', 'Content Mastery']
+                
+                fig = go.Figure()
+                
+                # User Stats (Dynamically scaled against their inputted XP)
+                user_resilience = 60 + (current_xp * 2) 
+                user_values = [100, min(100, (current_xp / 15) * 100), min(100, user_resilience), min(100, 30 + (current_xp * 3))]
+                user_values.append(user_values[0])
+                
+                # Mentor Stats
+                mentor_xp = top_mentor['Years_Experience']
+                mentor_values = [100, min(100, (mentor_xp / 15) * 100), 95, min(100, 50 + (mentor_xp * 2))]
+                mentor_values.append(mentor_values[0])
+                
+                theta_values = categories + [categories[0]]
+                
+                fig.add_trace(go.Scatterpolar(
+                    r=user_values,
+                    theta=theta_values,
+                    fill='toself',
+                    name='You (Novice/Core Tier)',
+                    line_color='#F43F5E',
+                    opacity=0.8
+                ))
+                
+                top_mentor_name = f"Prof. {top_mentor.get('First_Name', '')} {top_mentor.get('Last_Name', '')}" if top_mentor.get('First_Name', '') else top_mentor['Teacher_ID']
+                
+                fig.add_trace(go.Scatterpolar(
+                    r=mentor_values,
+                    theta=theta_values,
+                    fill='toself',
+                    name=f"{top_mentor_name} (Veteran Legend)",
+                    line_color='#10B981',
+                    opacity=0.6
+                ))
+                
+                fig.update_layout(
+                    polar=dict(radialaxis=dict(visible=True, range=[0, 100], gridcolor='rgba(255, 255, 255, 0.2)')),
+                    showlegend=True,
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='white'),
+                    margin=dict(t=30, b=30, l=30, r=30)
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+                # Expander for all remaining overflow matches
+                if len(mentors) > 3:
+                    with st.expander(f"View Full Directory: {len(mentors) - 3} Other Applicable Mentors in {region}"):
+                        display_cols = ['Teacher_ID', 'First_Name', 'Last_Name', 'Years_Experience', 'Educational_Attainment']
+                        st.dataframe(mentors.iloc[3:][[c for c in display_cols if c in mentors.columns]].reset_index(drop=True), use_container_width=True)
             else:
-                st.warning("No high-experience mentors currently available in your node criteria.")
+                st.warning("No high-experience mentors currently available in your node criteria. Try expanding your search to adjacent regions.")

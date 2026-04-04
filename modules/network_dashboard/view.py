@@ -28,11 +28,17 @@ def render(df):
             node_limit = 150 # Global limit to avoid browser crash
         else:
             working_df = df[df['Region'] == target_region]
-            node_limit = 25 # Localized limit to match Teacher view perfectly
+            node_limit = 35 # Localized limit to match Teacher view perfectly
             
         with st.spinner("Rendering Physics Sandbox..."):
             html_data = build_pyvis_graph(working_df, limit=node_limit)
             components.html(html_data, height=530)
+            
+        # Display overflow professors
+        overflow_count = len(working_df) - node_limit
+        if overflow_count > 0:
+            with st.expander(f"View {overflow_count} Additional Teachers (Hidden due to Node Density Limits)"):
+                st.dataframe(working_df.iloc[node_limit:][["Teacher_ID", "First_Name", "Last_Name", "Region", "Major_Specialization", "Years_Experience"]].reset_index(drop=True), use_container_width=True)
 
         # Legend below graph, horizontally compressed to avoid scrollbars
         legend_cols = st.columns([1, 1])

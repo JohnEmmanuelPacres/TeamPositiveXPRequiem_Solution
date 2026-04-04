@@ -101,20 +101,44 @@ else:
         render_intel(df)
         
     elif selection == "Local Ecosystem (Network)":
-        # Simplified Network passing regional filter requirement conceptually
         from modules.network_dashboard.graph_builder import build_pyvis_graph
         import streamlit.components.v1 as components
         from core.data_loader import REGION_COORDS
         
-        st.markdown("<div class='main-header'>Local Ecosystem</div>", unsafe_allow_html=True)
-        st.markdown("<div class='sub-header'>A view of peers and mentors within your network cluster.</div>", unsafe_allow_html=True)
+        st.markdown("<div class='main-header'>Local Mentorship Ecosystem</div>", unsafe_allow_html=True)
+        st.markdown("<div class='sub-header'>A topological view of your immediate peers and accessible 'Veteran Legend' mentors.</div>", unsafe_allow_html=True)
 
         teacher_region = st.selectbox("Your Operating Region:", list(REGION_COORDS.keys()))
-        regional_df = df[df['Region'] == teacher_region]
+        regional_df = df[df['Region'] == teacher_region].copy()
 
-        # Teacher view receives a smaller scoped ecosystem
-        html_data = build_pyvis_graph(regional_df, limit=25) 
-        components.html(html_data, height=500)
+        # Show quick stats
+        veteran_count = len(regional_df[regional_df['Years_Experience'] >= 15])
+        standard_count = len(regional_df) - veteran_count
+        
+        st.markdown(f"**Ecosystem Snapshot for {teacher_region}:** Discovered **{veteran_count}** Local Legends and **{standard_count}** Standard Nodes.")
+
+        # Teacher view receives a strictly localized ecosystem
+        with st.spinner("Rendering Private Network Topology..."):
+            html_data = build_pyvis_graph(regional_df, limit=35) 
+            components.html(html_data, height=520)
+            
+        # Display overflow professors that didn't fit in the 35 node limit
+        overflow_count = len(regional_df) - 35
+        if overflow_count > 0:
+            with st.expander(f"View {overflow_count} Additional Regional Peers (Hidden to preserve graph performance)"):
+                st.dataframe(regional_df.iloc[35:][["Teacher_ID", "First_Name", "Last_Name", "Major_Specialization", "Years_Experience"]].reset_index(drop=True), use_container_width=True)
+            
+        # Graph Legend
+        legend_cols = st.columns([1, 1])
+        with legend_cols[0]:
+            st.markdown("**Node Types:**\n<ul style=\"list-style: none; padding-left: 0;\"><li>⭐ Star (Local Legend, 15+ Yrs Exp)</li><li>🔵 Circle (Standard)</li><li>🔴 Red Circle (Region Hub)</li></ul>", unsafe_allow_html=True)
+        with legend_cols[1]:
+            st.markdown("**Subjects Taught:**")
+            sub_cols = st.columns(2)
+            with sub_cols[0]:
+                st.markdown("<ul style=\"list-style: none; padding-left: 0;\"><li>🟦 Physics</li><li>🟩 Chemistry</li><li>🟧 Biology</li></ul>", unsafe_allow_html=True)
+            with sub_cols[1]:
+                st.markdown("<ul style=\"list-style: none; padding-left: 0;\"><li>🟪 Math</li><li>⬜ Gen Sci</li><li>⚪ Other</li></ul>", unsafe_allow_html=True)
         
 st.sidebar.markdown("---")
 st.sidebar.caption("Prototype built for DOST Hackathon by Team PositiveXPRequiem")
