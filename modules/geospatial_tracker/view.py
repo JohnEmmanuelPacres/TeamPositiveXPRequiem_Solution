@@ -30,7 +30,10 @@ def render(df):
     with col_a:
         st.markdown("### Regional Geospatial Map")
     with col_b:
-        view_mode = st.radio("Visualization Mode", ["Total Workforce Density", "Underserved Hotspots (Out-of-Field)"], horizontal=True, label_visibility="collapsed")
+        v_modes = ["Total Workforce Density", "Underserved Hotspots (Out-of-Field)"]
+        v_idx = v_modes.index(st.session_state.get('geo_view_mode', v_modes[0]))
+        view_mode = st.radio("Visualization Mode", v_modes, index=v_idx, horizontal=True, label_visibility="collapsed")
+        st.session_state['geo_view_mode'] = view_mode
         
     map_df = df_internal.copy()
     if "Underserved" in view_mode:
@@ -85,15 +88,26 @@ def render(df):
     with col1:
         region_options = list(REGION_COORDS.keys())
         source_options = ["Global Nearest (Any)"] + region_options
-        source_region = st.selectbox("Source Deployment Region", source_options, index=0)
+        s_idx = source_options.index(st.session_state.get('geo_source_region', source_options[0]))
+        source_region = st.selectbox("Source Deployment Region", source_options, index=s_idx)
+        st.session_state['geo_source_region'] = source_region
         
     with col2:
         default_index = region_options.index(priority_region) if priority_region in region_options else 0
-        target_region = st.selectbox("Target Deployment Zone", region_options, index=default_index)
+        saved_target = st.session_state.get('geo_target_region')
+        t_idx = region_options.index(saved_target) if saved_target in region_options else default_index
+        target_region = st.selectbox("Target Deployment Zone", region_options, index=t_idx)
+        st.session_state['geo_target_region'] = target_region
         
     with col3:
-        subject = st.selectbox("Request Specialization", ["Any", "Chemistry", "Physics", "Biology", "Mathematics", "General Science"])
-        use_ai_epicenter = st.checkbox("Deploy to AI Epicenter", value=True)
+        subject_opts = ["Any", "Chemistry", "Physics", "Biology", "Mathematics", "General Science"]
+        sub_idx = subject_opts.index(st.session_state.get('geo_subject', subject_opts[0]))
+        subject = st.selectbox("Request Specialization", subject_opts, index=sub_idx)
+        st.session_state['geo_subject'] = subject
+        
+        epicenter_val = st.session_state.get('geo_use_ai_epicenter', True)
+        use_ai_epicenter = st.checkbox("Deploy to AI Epicenter", value=epicenter_val)
+        st.session_state['geo_use_ai_epicenter'] = use_ai_epicenter
         
     # AI Epicenter logic
     epicenter_coords, epicenter_df = find_vulnerability_epicenter(df_internal, target_region)
