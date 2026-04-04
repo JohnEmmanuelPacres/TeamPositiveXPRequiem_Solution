@@ -274,23 +274,28 @@ def render(df):
                 if history_data:
                     hist_df = pd.DataFrame(history_data)
                     
-                    # Linear projection for 2027
-                    x = hist_df['Year'].values
-                    forecast_year = 2027
-                    forecast_row = {'Year': forecast_year}
-                    
-                    for metric in ['Fragility', 'Critical Nodes', 'Novice Count']:
-                        y_vals = hist_df[metric].values
-                        # Fit 1-degree polynomial (linear regression)
-                        coeffs = np.polyfit(x, y_vals, 1)
-                        pred = int(round(np.polyval(coeffs, forecast_year)))
-                        # Ensure no negative projections
-                        forecast_row[metric] = max(0, pred) 
+                    if len(hist_df) < 2:
+                        st.warning("Insufficient historical telemetry (requires at least 2 years of data) to generate 2027 projection.")
+                        has_forecast = False
+                    else:
+                        has_forecast = True
+                        # Linear projection for 2027
+                        x = hist_df['Year'].values
+                        forecast_year = 2027
+                        forecast_row = {'Year': forecast_year}
+                        
+                        for metric in ['Fragility', 'Critical Nodes', 'Novice Count']:
+                            y_vals = hist_df[metric].values
+                            # Fit 1-degree polynomial (linear regression)
+                            coeffs = np.polyfit(x, y_vals, 1)
+                            pred = int(round(np.polyval(coeffs, forecast_year)))
+                            # Ensure no negative projections
+                            forecast_row[metric] = max(0, pred) 
                     
                     fig_trend = go.Figure()
                     
                     colors = {'Fragility': '#FCD34D', 'Critical Nodes': '#F43F5E', 'Novice Count': '#3B82F6'}
-                    names = {'Fragility': 'Avg Fragility', 'Critical Nodes': 'Critical Out-of-Field', 'Novice Count': 'Novice Count'}
+                    names = {'Fragility': 'Avg Fragility', 'Critical Nodes': 'Critical Risk Nodes', 'Novice Count': 'Novice Count'}
                     
                     for metric in ['Fragility', 'Critical Nodes', 'Novice Count']:
                         # Historical Solid Line
@@ -302,16 +307,18 @@ def render(df):
                             marker=dict(size=8)
                         ))
                         
-                        # Projected 2027 Dashed Line
-                        last_year_val = hist_df.iloc[-1][metric]
-                        fig_trend.add_trace(go.Scatter(
-                            x=[2026, 2027], 
-                            y=[last_year_val, forecast_row[metric]],
-                            mode='lines+markers',
-                            name=f"{names[metric]} (Forecast)",
-                            line=dict(color=colors[metric], width=3, dash='dash'),
-                            marker=dict(size=8, symbol='star', color=colors[metric])
-                        ))
+                        if has_forecast:
+                            # Projected 2027 Dashed Line
+                            last_year_val = hist_df.iloc[-1][metric]
+                            last_year = hist_df['Year'].max()
+                            fig_trend.add_trace(go.Scatter(
+                                x=[last_year, 2027], 
+                                y=[last_year_val, forecast_row[metric]],
+                                mode='lines+markers',
+                                name=f"{names[metric]} (Forecast)",
+                                line=dict(color=colors[metric], width=3, dash='dash'),
+                                marker=dict(size=8, symbol='star', color=colors[metric])
+                            ))
                     
                     fig_trend.update_layout(
                         plot_bgcolor='rgba(0,0,0,0)',
@@ -324,7 +331,7 @@ def render(df):
                     )
                     
                     st.plotly_chart(fig_trend, use_container_width=True)
-                    st.caption("*Dashed lines represent probabilisitic OLS linear projections based on baseline STAR programmatic ROI.*")
+                    st.caption("*Dashed lines represent probabilistic OLS linear projections based on baseline STAR programmatic ROI.*")
 
     else:
         # Teacher View
