@@ -18,9 +18,20 @@ def render(df):
             st.markdown("<ul><li>Scroll to zoom in/out</li><li>Click and drag background to pan</li></ul>", unsafe_allow_html=True)
         with nav_cols[1]:
             st.markdown("<ul><li>Click and drag node to move</li><li>Hover for details</li></ul>", unsafe_allow_html=True)
-
+            
+        # Add region filter so the Admin view matches the localized teacher view density
+        target_region = st.selectbox("Filter Topology by Region:", ["All Regions"] + list(REGION_COORDS.keys()))
+        
+        if target_region == "All Regions":
+            st.info("**Note:** When viewing 'All Regions', the graph is limited to a global cross-section of 150 nodes to prevent browser crashing. For a complete local view, filter by a specific region above.")
+            working_df = df
+            node_limit = 150 # Global limit to avoid browser crash
+        else:
+            working_df = df[df['Region'] == target_region]
+            node_limit = 25 # Localized limit to match Teacher view perfectly
+            
         with st.spinner("Rendering Physics Sandbox..."):
-            html_data = build_pyvis_graph(df)
+            html_data = build_pyvis_graph(working_df, limit=node_limit)
             components.html(html_data, height=530)
 
         # Legend below graph, horizontally compressed to avoid scrollbars

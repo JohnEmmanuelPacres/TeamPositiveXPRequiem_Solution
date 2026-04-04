@@ -36,13 +36,16 @@ timeframes = {
 options_list = list(timeframes.values())
 default_index = list(timeframes.keys()).index(st.session_state['active_year'])
 
-st.sidebar.selectbox(
-    "Select Timeline:", 
-    options=options_list, 
-    index=default_index,
-    key="year_radio_key",
-    on_change=transition_timeframe
-)
+if role == "Admin":
+    st.sidebar.selectbox(
+        "Select Timeline:", 
+        options=options_list, 
+        index=default_index,
+        key="year_radio_key",
+        on_change=transition_timeframe
+    )
+else:
+    st.sidebar.markdown(f"**Current Year:** {timeframes[st.session_state['active_year']]}")
 
 if 'working_df' not in st.session_state:
     st.session_state['working_df'] = get_working_dataframe(st.session_state['active_year'])
@@ -93,12 +96,16 @@ else:
         # Simplified Network passing regional filter requirement conceptually
         from modules.network_dashboard.graph_builder import build_pyvis_graph
         import streamlit.components.v1 as components
+        from core.data_loader import REGION_COORDS
         
         st.markdown("<div class='main-header'>Local Ecosystem</div>", unsafe_allow_html=True)
         st.markdown("<div class='sub-header'>A view of peers and mentors within your network cluster.</div>", unsafe_allow_html=True)
-        
+
+        teacher_region = st.selectbox("Your Operating Region:", list(REGION_COORDS.keys()))
+        regional_df = df[df['Region'] == teacher_region]
+
         # Teacher view receives a smaller scoped ecosystem
-        html_data = build_pyvis_graph(df, limit=50) 
+        html_data = build_pyvis_graph(regional_df, limit=25) 
         components.html(html_data, height=500)
         
 st.sidebar.markdown("---")
