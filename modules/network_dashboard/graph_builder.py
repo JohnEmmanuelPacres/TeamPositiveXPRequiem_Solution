@@ -39,13 +39,17 @@ def build_pyvis_graph(df: pd.DataFrame, limit: int = 150) -> str:
         
         # Enhanced Tooltip/Title for better UX
         years_exp = row["Years_Experience"]
-        label_title = f"{t_id}\n{subject}\n{years_exp} Yrs Exp"
+        first_name = row.get("First_Name", "")
+        last_name = row.get("Last_Name", "")
+        prof_name = f"Prof. {first_name} {last_name}".strip() if first_name else "Unknown"
+        
+        label_title = f"{prof_name}\nID: {t_id}\n{subject}\n{years_exp} Yrs Exp"
         
         G.add_node(t_id, size=node_size, color=node_color, title=label_title, shape=node_shape)
         G.add_edge(reg, t_id, color="#374151")
         
     # PyVis Rendering
-    net = Network(height="520px", width="100%", bgcolor="#0E1117", font_color="white", select_menu=False, filter_menu=False, cdn_resources="remote")
+    net = Network(height="520px", width="100%", bgcolor="#0E1117", font_color="white", select_menu=True, filter_menu=False, cdn_resources="remote")
     net.from_nx(G)
     
     # Improved Physics settings and options for a premium feel
