@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+import base64
 
 def set_page_config():
     st.set_page_config(
@@ -51,3 +53,119 @@ def inject_custom_css():
 def render_header(title: str, subtitle: str):
     st.markdown(f"<div class='main-header'>{title}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='sub-header'>{subtitle}</div>", unsafe_allow_html=True)
+    
+def load_font_b64(path):
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    return None
+
+def inject_astra_theme():
+    font_b64 = load_font_b64("core/font/Avenix-Regular.otf")
+    
+    if font_b64:
+        font_face = f"""
+        @font-face {{
+            font-family: 'Avenix';
+            src: url('data:font/truetype;base64,{font_b64}') format('truetype');
+            font-weight: normal; font-style: normal;
+        }}
+        """
+        astra_font = "'Avenix', sans-serif"
+    else:
+        font_face = ""
+        astra_font = "'Montserrat', sans-serif"
+
+    st.markdown(f"""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Inter:wght@400;500&display=swap');
+        {font_face}
+
+        /* 1. Background Fade */
+        [data-testid="stAppViewContainer"] {{
+            background: linear-gradient(135deg, #f5ede0 0%, #e8f0e8 50%, #dceadc 100%);
+            min-height: 100vh;
+        }}
+
+        /* Hide Streamlit default elements */
+        [data-testid="stHeader"], #MainMenu, footer {{ visibility: hidden; }}
+        [data-testid="stToolbar"], [data-testid="stDecoration"] {{ display: none; }}
+
+        /* 2. ASTRA Title: Starts at center, then moves up */
+        .astra-title {{
+            font-family: {astra_font};
+            font-size: 55px;
+            letter-spacing: 8px;
+            color: #2b2b2b;
+            text-align: center;
+            opacity: 0;
+            animation: astraEntrance 3.5s ease-in-out forwards;
+        }}
+
+        /* 3. Subtitle: Follows the Title */
+        .astra-subtitle {{
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: #555;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: subtitleEntrance 3.5s ease-in-out forwards;
+        }}
+
+        /* 4. Login Form: Appears only after the move-up */
+        [data-testid="stForm"] {{
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 450px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: formFadeIn 1s ease-out 3s forwards;
+        }}
+
+        /* --- THE ANIMATION SEQUENCES --- */
+
+        @keyframes astraEntrance {{
+            0% {{ opacity: 0; transform: translateY(100px); }}      
+            20% {{ opacity: 1; transform: translateY(100px); }}     
+            70% {{ opacity: 1; transform: translateY(100px); }}     
+            100% {{ opacity: 1; transform: translateY(0); }}        
+        }}
+
+        @keyframes subtitleEntrance {{
+            0% {{ opacity: 0; transform: translateY(100px); }}      
+            30% {{ opacity: 0; transform: translateY(100px); }}     
+            50% {{ opacity: 1; transform: translateY(100px); }}     
+            70% {{ opacity: 1; transform: translateY(100px); }}     
+            100% {{ opacity: 1; transform: translateY(0); }}        
+        }}
+
+        @keyframes formFadeIn {{
+            from {{ opacity: 0; transform: translateY(20px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+
+        /* Existing Label and Input Styles */
+        [data-testid="stForm"] label {{
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #444;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }}
+        [data-testid="stFormSubmitButton"] button {{
+            background-color: #2b2b2b !important;
+            color: white !important;
+            border-radius: 8px !important;
+            width: 100% !important;
+            margin-top: 25px !important;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
