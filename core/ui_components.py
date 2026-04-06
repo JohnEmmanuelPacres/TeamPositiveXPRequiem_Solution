@@ -100,6 +100,18 @@ def inject_astra_theme():
         background-position: 0% 50%;
     }}
 }}
+.logo-container {{
+            font-family: {astra_font};
+            font-size: 18px;
+            letter-spacing: 0.8em; 
+            text-align: center;
+            color: #333;
+            padding: 20px 0 10px 0;
+            width: 100%;
+            text-transform: uppercase;
+            background-color: #FFF2DE;
+        }}
+
 
         /* Hide Streamlit default elements */
         [data-testid="stHeader"], #MainMenu, footer {{ visibility: hidden; }}

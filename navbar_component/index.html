@@ -12,7 +12,8 @@
       body {
         margin: 0;
         padding: 0;
-        background: transparent;
+        background: #c89600;
+        top: -50px;
       }
 
       .top-nav-wrapper {
@@ -26,7 +27,6 @@
         pointer-events: auto;
       }
 
-      /* THIS FORCES BURGER ICON TO HIDE ON DESKTOP */
       .burger-icon {
         display: none !important;
       }
@@ -139,7 +139,7 @@
 
       .account-dropdown {
         position: absolute;
-        top: 60px;
+        top: 55px;
         right: 0;
         width: 180px;
         background: white;
@@ -187,6 +187,39 @@
         background: #fff5f5;
       }
 
+      /* =========================================
+         TIMELINE STYLING (Desktop & Mobile)
+         ========================================= */
+      .mobile-timeline-wrapper {
+        display: none;
+      }
+
+      .secondary-nav-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 95%;
+        max-width: 1200px;
+        margin: 15px auto 0 auto;
+        pointer-events: none;
+      }
+
+      .desktop-timeline {
+        pointer-events: auto;
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 8px 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        outline: none;
+        cursor: pointer;
+      }
+
+      /* MOBILE RESPONSE */
       @media (max-width: 768px) {
         .nav-text-wrapper {
           display: none;
@@ -205,7 +238,6 @@
           width: 100%;
         }
 
-        /* THIS FORCES BURGER ICON TO APPEAR ON MOBILE */
         .burger-icon {
           display: flex !important;
           width: 46px;
@@ -256,6 +288,34 @@
         .nav-divider {
           display: none;
         }
+
+        /* Mobile Timeline Display */
+        .secondary-nav-wrapper {
+          display: none;
+        }
+        .mobile-timeline-wrapper {
+          display: block;
+          width: 100%;
+          padding: 5px 0 10px 0;
+        }
+        .nav-divider-horizontal {
+          width: 100%;
+          height: 1px;
+          background: #f0f0f0;
+          margin: 10px 0;
+        }
+        .timeline-select {
+          width: calc(100% - 40px);
+          margin: 5px 20px;
+          padding: 10px;
+          border-radius: 8px;
+          border: 1px solid #e0e0e0;
+          font-family: "Montserrat", sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          background-color: #f9f9f9;
+          outline: none;
+        }
       }
     </style>
   </head>
@@ -279,6 +339,7 @@
           const args = event.data.args;
           document.getElementById("root").innerHTML = args.html;
 
+          // Standard Nav Item Listeners
           const navItems = document.querySelectorAll("[data-nav]");
           navItems.forEach((item) => {
             item.addEventListener("click", function () {
@@ -286,11 +347,20 @@
             });
           });
 
+          // Timeline Select Listeners
+          const timelineSelects = document.querySelectorAll("[data-timeline]");
+          timelineSelects.forEach((select) => {
+            select.addEventListener("change", function () {
+              sendDataToPython("TIMELINE_" + this.value);
+            });
+          });
+
+          // THIS MUST BE 350 so Streamlit doesn't cut the dropdown in half!
           window.parent.postMessage(
             {
               isStreamlitMessage: true,
               type: "streamlit:setFrameHeight",
-              height: 80,
+              height: 115,
             },
             "*",
           );

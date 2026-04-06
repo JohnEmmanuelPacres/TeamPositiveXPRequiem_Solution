@@ -10,28 +10,35 @@ set_page_config()
 inject_custom_css()
 inject_astra_theme() 
 
-# --- MAGIC CSS: Make the Component Iframe Sticky & Click-through ---
+# --- MAGIC CSS: Hide Sidebar & Setup Sticky Navbar ---
 st.markdown("""
     <style>
-    [data-testid="stHeader"] { visibility: hidden; }
+    /* Hides default Streamlit header and sidebar entirely */
+    [data-testid="stHeader"],[data-testid="stSidebar"],[data-testid="collapsedControl"] { 
+        display: none !important; 
+    }
     
-    /* Reduced this to pull the dashboard up nicely under the navbar */
-    .block-container { padding-top: 3.5rem !important; }
+    .block-container { padding-top: 0rem !important; }
     
     iframe[title="navbar_component.custom_navbar"] {
         position: fixed;
-        top: -50px;
+        top: 0px; /* <--- CHANGE THIS FROM 20px TO 0px */
         left: 0;
         width: 100vw;
-        height: 350px !important; /* Forces iframe open for the dropdown */
+        height: 350px !important; 
         z-index: 9999;
         pointer-events: none; 
+        background-color: #FFF2DE;
     }
     
-    /* This perfectly kills the 350px "ghost" gap */
+    /* Safely removes the ghost gap WITHOUT clipping the dropdown! */
     div[data-testid="stElementContainer"]:has(iframe[title="navbar_component.custom_navbar"]) {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100%;
         height: 0px !important;
-        margin-bottom: -350px !important;
+        z-index: 9999;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -46,6 +53,7 @@ if not st.session_state.get('authenticated', False):
 role = get_current_role()
 username = st.session_state.get('username', 'User')
 
+# --- TIMELINE LOGIC ---
 if 'active_year' not in st.session_state:
     st.session_state['active_year'] = '2026'
 
@@ -55,7 +63,15 @@ if 'working_df' not in st.session_state:
 df = normalize_record_columns(st.session_state['working_df'])
 st.session_state['working_df'] = df
 
-# --- MODULES ---
+timeframes = {
+    "2026": "2026 (Present AI Intervention)",
+    "2025": "2025 (Initial Rollout Phase)",
+    "2024": "2024 (Critical Shortage)",
+    "2023": "2023 (Pandemic Recovery)",
+    "2022": "2022 (Data Baseline)"
+}
+
+# --- MODULES CONFIGURATION ---
 if role == "Admin":
     modules = {
         "Intelligence Analytics": {"icon": "icon-cpu", "sub": None, "display": "Intelligence Analytics", "module": lambda df: __import__('modules.intelligence.view', fromlist=['']).render(df)},
@@ -69,11 +85,10 @@ else:
         "Local Ecosystem (Network)": {"icon": "icon-waypoints", "sub": "(Network)", "display": "Local Ecosystem", "module": lambda df: __import__('modules.network_dashboard.view', fromlist=['']).render_teacher_view(df)}
     }
 
-# SAFETY CHECK 1: Ensure session state exists and is valid for current role
 if "current_nav" not in st.session_state or st.session_state.current_nav not in modules:
     st.session_state.current_nav = list(modules.keys())[0]
 
-# --- BUILD THE HTML STRING ---
+# --- BUILD DYNAMIC HTML FOR NAVBAR ---
 nav_items_html = ""
 module_keys = list(modules.keys())
 
@@ -83,7 +98,6 @@ for i, mod_key in enumerate(module_keys):
     nav_class = "nav-item-active" if is_active else "nav-item"
     
     sublabel_html = f'<div class="nav-sublabel">{mod_data["sub"]}</div>' if mod_data.get("sub") else ""
-    
     nav_items_html += f"""
     <div data-nav="{mod_key}" class="{nav_class}">
         <div class="nav-icon"><i class="{mod_data['icon']}"></i></div>
@@ -96,6 +110,55 @@ for i, mod_key in enumerate(module_keys):
     if i < len(module_keys) - 1:
         nav_items_html += '<div class="nav-divider"></div>'
 
+# --- BUILD DYNAMIC TIMELINE DROPDOWN HTML ---
+mobile_timeline_html = ""
+desktop_timeline_html = ""
+
+st.markdown("""
+    <div class="logo-container">
+        ASTRA
+    </div>
+""", unsafe_allow_html=True)
+
+if role == "Admin":
+    options_html = ""
+    for year, label in timeframes.items():
+        selected = "selected" if year == st.session_state['active_year'] else ""
+        options_html += f'<option value="{year}" {selected}>{label}</option>'
+    
+    # Render inside the burger menu on mobile
+    mobile_timeline_html = f"""
+    <div class="mobile-timeline-wrapper">
+        <div class="nav-divider-horizontal"></div>
+        <div class="nav-label" style="text-align: left; padding: 10px 20px 5px 20px;">Select Timeline</div>
+        <select data-timeline="true" class="timeline-select">{options_html}</select>
+    </div>
+    """
+    
+    # Render below the navbar on desktop
+    desktop_timeline_html = f"""
+    <div class="secondary-nav-wrapper">
+        <select data-timeline="true" class="desktop-timeline">{options_html}</select>
+    </div>
+    """
+else:
+    # Teachers cannot change time, so they just see the label
+    current_label = timeframes[st.session_state['active_year']]
+    mobile_timeline_html = f"""
+    <div class="mobile-timeline-wrapper">
+        <div class="nav-divider-horizontal"></div>
+        <div class="nav-label" style="text-align: left; padding: 10px 20px 5px 20px;">Timeline</div>
+        <div style="padding: 0 20px 10px 20px; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; color: #666;">{current_label}</div>
+    </div>
+    """
+    desktop_timeline_html = f"""
+    <div class="secondary-nav-wrapper">
+        <div style="font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; color: #666; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 6px;">
+            Active Year: {current_label}
+        </div>
+    </div>
+    """
+
 full_html = f"""
 <div class="top-nav-wrapper">
     <input type="checkbox" id="menu-toggle">
@@ -103,6 +166,7 @@ full_html = f"""
     
     <div class="nav-container">
         {nav_items_html}
+        {mobile_timeline_html}
     </div>
     
     <div class="account-wrapper">
@@ -115,6 +179,7 @@ full_html = f"""
         </div>
     </div>
 </div>
+{desktop_timeline_html}
 """
 
 # --- DECLARE & CALL THE CUSTOM COMPONENT ---
@@ -125,17 +190,25 @@ clicked_nav = custom_navbar(html=full_html, key="my_navbar")
 if clicked_nav and clicked_nav != st.session_state.get("last_clicked"):
     st.session_state.last_clicked = clicked_nav
     
-    if clicked_nav == "LOGOUT":
+    # 1. Catch the Timeline Updates
+    if clicked_nav.startswith("TIMELINE_"):
+        new_year = clicked_nav.split("_")[1]
+        st.session_state['active_year'] = new_year
+        st.session_state['working_df'] = get_working_dataframe(new_year)
+        st.rerun()
+        
+    # 2. Catch the Logout Event
+    elif clicked_nav == "LOGOUT":
         logout()
-        # Clear navigation history completely on logout
         if "current_nav" in st.session_state:
             del st.session_state["current_nav"]
         st.rerun()
+        
+    # 3. Catch Page Switches
     elif clicked_nav in modules:
         st.session_state.current_nav = clicked_nav
         st.rerun()
 
-# SAFETY CHECK 2: Double check before executing (Catches edge cases)
 if st.session_state.current_nav not in modules:
     st.session_state.current_nav = list(modules.keys())[0]
 
