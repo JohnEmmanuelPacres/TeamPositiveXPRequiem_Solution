@@ -78,6 +78,14 @@ def render(df):
     font-size:18px;
     margin-bottom: 130px; /* Big gap for desktop layout */
 }
+  .astra-alert-info {
+        background-color: rgba(219, 234, 254, 0.5); border: 1.5px solid rgba(59, 130, 246, 0.6);
+        padding: 20px; border-radius: 12px; color: #1E3A8A; font-family: 'Montserrat', sans-serif;
+        font-size: 14px; margin-bottom: 20px;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 0 0 35px rgba(59, 130, 246, 0.15);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .astra-alert-info strong { font-weight: 800; color: #1e40af; letter-spacing: 0.5px; }
 
 /* Mobile View (Screens smaller than 768px) */
 @media (max-width: 768px) {
@@ -121,8 +129,11 @@ div.stButton > button[kind="primary"] {
     </p>""", unsafe_allow_html=True)
         
         st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Intervention Engine</h3>", unsafe_allow_html=True)
-        st.info("Simulate re-assigning a teacher to fix regional fragility bottlenecks dynamically.")
-            
+        st.markdown("""
+            <div class="astra-alert-info">
+                Simulate re-assigning a teacher to fix regional fragility bottlenecks dynamically.
+            </div>
+            """, unsafe_allow_html=True)  
         if df.empty:
             st.warning("No teacher data available for simulation.")
         else:
@@ -193,7 +204,11 @@ div.stButton > button[kind="primary"] {
                 st.markdown("<div style='font-size: 0.85rem; color: #666; padding-top: 5px;'><strong>Navigation:</strong><br>• Scroll to zoom in/out<br>• Click & drag to pan/move nodes</div>", unsafe_allow_html=True)
 
             if target_region == "All Regions":
-                st.info("**Note:** When viewing 'All Regions', the graph is limited to a global cross-section of 150 nodes to prevent browser crashing. Filter by a specific region for a complete local view.")
+                st.markdown("""
+            <div class="astra-alert-info">
+                <strong>Note:</strong> When viewing 'All Regions', the graph is limited to a global cross-section of 150 nodes to prevent browser crashing. Filter by a specific region for a complete local view.
+            </div>
+            """, unsafe_allow_html=True)
                 working_df = df
                 node_limit = 150 
             else:
