@@ -643,106 +643,204 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
 
     else:
         # Teacher View
-        render_header("Career Skill-Tree Matrix", "Your personal growth trajectory and local mentorship ecosystem.")
-        st.markdown("---")
         
-        st.subheader("Mentorship Matcher")
-        st.info("Based on your Region and Major, we identify 'Local Legends' who have >12 years of specialized field experience to guide you.")
-        
+        st.markdown("""
+        <style>
+        @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@400;500&display=swap");
+
+        /* Force Light Beige Background to match image */
+        .stApp { background-color: #F1EFE9 !important; }
+
+        /* Custom White Metric Cards */
+        .white-metric-card {
+            background-color: rgb(255, 255, 255, 0.7); padding: 20px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02); display: flex; flex-direction: column;
+            justify-content: space-between; height: 100%;
+        }
+
+        /* A.S.T.R.A. High-Tech Glass Alerts */
+        .astra-alert-success {
+            background-color: rgba(209, 244, 217, 0.5); border: 1.5px solid rgba(31, 173, 102, 0.6);
+            padding: 20px; border-radius: 12px; color: #166534; font-family: 'Montserrat', sans-serif;
+            font-size: 14px; margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(31, 173, 102, 0.2), 0 0 35px rgba(31, 173, 102, 0.15);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .astra-alert-success strong { font-weight: 800; color: #065f46; letter-spacing: 0.5px; }
+
+        .astra-alert-warning {
+            background-color: rgba(254, 243, 199, 0.5); border: 1.5px solid rgba(245, 158, 11, 0.6);
+            padding: 20px; border-radius: 12px; color: #92400E; font-family: 'Montserrat', sans-serif;
+            font-size: 14px; margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2), 0 0 35px rgba(245, 158, 11, 0.15);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .astra-alert-warning strong { font-weight: 800; color: #b45309; letter-spacing: 0.5px; text-transform: uppercase; }
+
+        .astra-alert-info {
+            background-color: rgba(219, 234, 254, 0.5); border: 1.5px solid rgba(59, 130, 246, 0.6);
+            padding: 20px; border-radius: 12px; color: #1E3A8A; font-family: 'Montserrat', sans-serif;
+            font-size: 14px; margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 0 0 35px rgba(59, 130, 246, 0.15);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .astra-alert-info strong { font-weight: 800; color: #1e40af; letter-spacing: 0.5px; }
+
+        .hero-subtitle{ color: #666; font-family: 'Montserrat', sans-serif; font-size:18px; margin-bottom: 50px; }
+
+        /* Custom Input Labels */
+        .stSelectbox label, .stNumberInput label { font-family: 'Montserrat', sans-serif !important; color: #44433E !important; font-weight: 600 !important; }
+.divider { width: 1.5px; height: 100vh; background: rgba(224, 224, 224, 0.8); margin: 0 auto; display: block; }
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .divider { display: none; }
+        }
+        div.stButton > button[kind="primary"] {
+    background-color: #FAFAFA !important;
+    color: black !important;
+    border: 2px solid #E7E7E7 !important;
+    border-radius: 8px !important;
+
+}
+        </style>
+        """, unsafe_allow_html=True)
+
+        # UI State Management so results don't disappear if user clicks the expander
+        if 'mentor_search_triggered' not in st.session_state:
+            st.session_state['mentor_search_triggered'] = False
+
+        # --- SPLIT LAYOUT ENGINE ---
+        left_col, div_col, right_col = st.columns([1.2, 0.1, 2.5], gap="small")
+
         from core.data_loader import REGION_COORDS
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
+
+        with left_col:
+            # Custom Large Title matching the image
+            st.markdown("""
+                <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: 0;">
+                    Career<br>Skill-Tree
+                </h1>
+                <p class="hero-subtitle" style="font-size:1.5rem;">
+                    Your personal growth trajectory and local mentorship ecosystem.
+                </p>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("<h4 style='color: #44433E; font-family: Montserrat, sans-serif; font-size: 1.2rem;'>Search Parameters</h4>", unsafe_allow_html=True)
+            
+            # Inputs stacked vertically in the left column for better fit
             region = st.selectbox("Your Region", list(REGION_COORDS.keys()))
-        with col2:
-            major = st.selectbox("Your Specialization",["Physics", "Chemistry", "Biology", "Mathematics", "General Science"])
-        with col3:
+            major = st.selectbox("Your Specialization", ["Physics", "Chemistry", "Biology", "Mathematics", "General Science"])
             current_xp = st.number_input("Your Current XP (Years)", min_value=0, max_value=40, value=2)
             
-        if st.button("Find Local Mentors"):
-            with st.spinner("Assembling Capacity-Building Cohort..."):
-                mentors = find_mentors(df, region, major)
-                
-            if len(mentors) > 0:
-                st.success(f"Match Found! Discovered {len(mentors)} 'Local Legends' in {region} specializing in {major}.")
-                
-                st.markdown("### Top 3 Recommended Mentors")
-                mentor_cols = st.columns(len(mentors.head(3)))
-                
-                for i, row_data in enumerate(mentors.head(3).iterrows()):
-                    _, mentor = row_data
-                    
-                    first_name = mentor.get('first_name', '')
-                    last_name = mentor.get('last_name', '')
-                    name_display = f"Prof. {first_name} {last_name}" if first_name else mentor['teacher_id']
-                    
-                    with mentor_cols[i]:
-                        st.markdown(f"""
-                        <div style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; border-left: 4px solid #10B981; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 100%;">
-                            <h4 style="margin:0; color:#10B981;">{name_display}</h4>
-                            <p style="font-size: 0.85em; color: #666; margin-bottom: 10px;">ID: {mentor['teacher_id']}</p>
-                            <div style="color: #333; font-size: 0.9em; line-height: 1.5;">
-                                <strong>Class:</strong> Level {min(5, int(mentor['years_experience']//5))} {mentor['major_specialization']} Master<br>
-                                <strong>XP:</strong> {mentor['years_experience']} Years Field Exp<br>
-                                <strong>Set:</strong> {mentor['educational_attainment']}<br>
-                            </div>
-                            <hr style="margin: 10px 0; border-color: #E5E7EB;">
-                            <em style="font-size: 0.85em; color:#D97706;">Buff: Accelerates local capacity-building.</em>
-                        </div>
-                        """, unsafe_allow_html=True)
-                
-                st.markdown("---")
-                st.markdown("### Skill-Tree Compatibility (You vs. Top Mentor)")
-                
-                top_mentor = mentors.iloc[0]
-                categories =['Subject Alignment', 'Mentorship XP', 'Resilience', 'Content Mastery']
-                
-                fig = go.Figure()
-                
-                user_resilience = 60 + (current_xp * 2) 
-                user_values =[100, min(100, (current_xp / 15) * 100), min(100, user_resilience), min(100, 30 + (current_xp * 3))]
-                user_values.append(user_values[0])
-                
-                mentor_xp = top_mentor['years_experience']
-                mentor_values =[100, min(100, (mentor_xp / 15) * 100), 95, min(100, 50 + (mentor_xp * 2))]
-                mentor_values.append(mentor_values[0])
-                
-                theta_values = categories + [categories[0]]
-                
-                fig.add_trace(go.Scatterpolar(
-                    r=user_values,
-                    theta=theta_values,
-                    fill='toself',
-                    name='You (Novice/Core Tier)',
-                    line_color='#F43F5E',
-                    opacity=0.8
-                ))
-                
-                top_mentor_name = f"Prof. {top_mentor.get('first_name', '')} {top_mentor.get('last_name', '')}" if top_mentor.get('first_name', '') else top_mentor['teacher_id']
-                
-                fig.add_trace(go.Scatterpolar(
-                    r=mentor_values,
-                    theta=theta_values,
-                    fill='toself',
-                    name=f"{top_mentor_name} (Veteran Legend)",
-                    line_color='#10B981',
-                    opacity=0.6
-                ))
-                
-                fig.update_layout(
-                    polar=dict(radialaxis=dict(visible=True, range=[0, 100], gridcolor='rgba(0, 0, 0, 0.1)')),
-                    showlegend=True,
-                    legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5), 
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    font=dict(color='#333'),
-                    margin=dict(t=30, b=30, l=10, r=10) 
-                )
-                st.plotly_chart(fig, use_container_width=True)
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("Find Local Mentors", type="primary", use_container_width=True):
+                st.session_state['mentor_search_triggered'] = True
 
-                if len(mentors) > 3:
-                    with st.expander(f"View Full Directory: {len(mentors) - 3} Other Applicable Mentors in {region}"):
-                        display_cols =['teacher_id', 'first_name', 'last_name', 'years_experience', 'educational_attainment']
-                        st.dataframe(mentors.iloc[3:][[c for c in display_cols if c in mentors.columns]].reset_index(drop=True), use_container_width=True)
-            else:
-                st.warning("No high-experience mentors currently available in your node criteria. Try expanding your search to adjacent regions.")
+        with div_col:
+            # Vertical Line CSS hook
+            st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+            
+        with right_col:
+            # Always display the instruction alert at the top of the right column
+            st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Mentorship Matcher</h3>", unsafe_allow_html=True)
+            st.markdown("""
+            <div class="astra-alert-info">
+                <strong>A.S.T.R.A DIRECTIVE:</strong> Based on your Region and Major, we identify <strong>'Local Legends'</strong> who have >12 years of specialized field experience to guide you.
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Only render results if the button has been clicked
+            if st.session_state['mentor_search_triggered']:
+                with st.spinner("Assembling Capacity-Building Cohort..."):
+                    mentors = find_mentors(df, region, major)
+                    
+                if len(mentors) > 0:
+                    st.markdown(f"""
+                    <div class="astra-alert-success">
+                        <strong>MATCH FOUND:</strong> Discovered {len(mentors)} 'Local Legends' in {region} specializing in {major}.
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Top 3 Recommended Mentors</h3>", unsafe_allow_html=True)
+                    mentor_cols = st.columns(len(mentors.head(3)))
+                    
+                    for i, row_data in enumerate(mentors.head(3).iterrows()):
+                        _, mentor = row_data
+                        
+                        first_name = mentor.get('first_name', '')
+                        last_name = mentor.get('last_name', '')
+                        name_display = f"Prof. {first_name} {last_name}" if first_name else mentor['teacher_id']
+                        
+                        with mentor_cols[i]:
+                            st.markdown(f"""
+                            <div class="white-metric-card" style="border-left: 4px solid #10B981; padding: 15px;">
+                                <h5 style="margin:0; color:#10B981; font-family: 'Montserrat', sans-serif;">{name_display}</h5>
+                                <p style="font-size: 0.85em; color: #666; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;">ID: {mentor['teacher_id']}</p>
+                                <div style="color: #333; font-size: 0.9em; line-height: 1.5; font-family: 'Inter', sans-serif;">
+                                    <strong>Class:</strong> Level {min(5, int(mentor['years_experience']//5))} {mentor['major_specialization']} Master<br>
+                                    <strong>XP:</strong> {mentor['years_experience']} Years Field Exp<br>
+                                    <strong>Set:</strong> {mentor['educational_attainment']}<br>
+                                </div>
+                                <hr style="margin: 10px 0; border-color: #E5E7EB;">
+                                <em style="font-size: 0.85em; color:#D97706; font-family: 'Inter', sans-serif;">Buff: Accelerates local capacity-building.</em>
+                            </div>
+                            """, unsafe_allow_html=True)
+                    
+                    st.markdown("<br><h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Skill-Tree Compatibility (You vs. Top Mentor)</h3>", unsafe_allow_html=True)
+                    
+                    top_mentor = mentors.iloc[0]
+                    categories =['Subject Alignment', 'Mentorship XP', 'Resilience', 'Content Mastery']
+                    
+                    fig = go.Figure()
+                    
+                    user_resilience = 60 + (current_xp * 2) 
+                    user_values =[100, min(100, (current_xp / 15) * 100), min(100, user_resilience), min(100, 30 + (current_xp * 3))]
+                    user_values.append(user_values[0])
+                    
+                    mentor_xp = top_mentor['years_experience']
+                    mentor_values =[100, min(100, (mentor_xp / 15) * 100), 95, min(100, 50 + (mentor_xp * 2))]
+                    mentor_values.append(mentor_values[0])
+                    
+                    theta_values = categories + [categories[0]]
+                    
+                    fig.add_trace(go.Scatterpolar(
+                        r=user_values,
+                        theta=theta_values,
+                        fill='toself',
+                        name='You (Novice/Core Tier)',
+                        line_color='#F43F5E',
+                        opacity=0.8
+                    ))
+                    
+                    top_mentor_name = f"Prof. {top_mentor.get('first_name', '')} {top_mentor.get('last_name', '')}" if top_mentor.get('first_name', '') else top_mentor['teacher_id']
+                    
+                    fig.add_trace(go.Scatterpolar(
+                        r=mentor_values,
+                        theta=theta_values,
+                        fill='toself',
+                        name=f"{top_mentor_name} (Veteran Legend)",
+                        line_color='#10B981',
+                        opacity=0.6
+                    ))
+                    
+                    fig.update_layout(
+                        polar=dict(radialaxis=dict(visible=True, range=[0, 100], gridcolor='rgba(0, 0, 0, 0.1)')),
+                        showlegend=True,
+                        legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5), 
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        font=dict(color='#333'),
+                        margin=dict(t=30, b=30, l=10, r=10) 
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+
+                    if len(mentors) > 3:
+                        with st.expander(f"View Full Directory: {len(mentors) - 3} Other Applicable Mentors in {region}"):
+                            display_cols =['teacher_id', 'first_name', 'last_name', 'years_experience', 'educational_attainment']
+                            st.dataframe(mentors.iloc[3:][[c for c in display_cols if c in mentors.columns]].reset_index(drop=True), use_container_width=True)
+                else:
+                    st.markdown("""
+                    <div class="astra-alert-warning">
+                        <strong>NO DIRECT MATCHES:</strong> No high-experience mentors currently available in your node criteria. Try expanding your search to adjacent regions.
+                    </div>
+                    """, unsafe_allow_html=True)
