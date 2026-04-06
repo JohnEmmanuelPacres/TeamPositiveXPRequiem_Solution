@@ -76,7 +76,7 @@ def render(df):
     color: #666;
     font-family: 'Montserrat', sans-serif;
     font-size:18px;
-    margin-bottom: 130px; /* Big gap for desktop layout */
+    margin-bottom: 150px; /* Big gap for desktop layout */
 }
   .astra-alert-info {
         background-color: rgba(219, 234, 254, 0.5); border: 1.5px solid rgba(59, 130, 246, 0.6);
@@ -100,6 +100,7 @@ def render(df):
     background: rgba(224, 224, 224, 0.8);
     margin: 0 auto; /* Centers the line in the small 0.1 column */
     display: block;
+    margin-top: -100px;
 }
 
 /* Hide divider on mobile so it doesn't look like a random line between stacked rows */
@@ -123,7 +124,7 @@ div.stButton > button[kind="primary"] {
     
     with left_col:
         st.markdown("""
-            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; margin-top: 0;">Obsidian<br>Mentorship</h1>
+            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; margin-top: -100px;">Obsidian<br>Mentorship</h1>
             <p class="hero-subtitle" style="font-size:1.5rem;">
         Interactive mapping of localized<br>teaching resources.
     </p>""", unsafe_allow_html=True)
@@ -194,7 +195,7 @@ div.stButton > button[kind="primary"] {
 
     with right_col:
         # ============ TAB 1: Topological Map ============
-            st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif; margin-bottom: 5px;'>Ecosystem Topology</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif; margin-bottom: 5px; margin-top: -100px;'>Ecosystem Topology</h3>", unsafe_allow_html=True)
             
             # Map Controls
             control_col, info_col = st.columns([1, 1])
@@ -273,6 +274,7 @@ def render_teacher_view(df):
     background: rgba(224, 224, 224, 0.8);
     margin: 0 auto; /* Centers the line in the small 0.1 column */
     display: block;
+    margin-top: -100px;
 }
 .hero-subtitle{
     color: #666;
@@ -302,7 +304,7 @@ def render_teacher_view(df):
     
     with left_col:
         st.markdown("""
-            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; margin-top: 0;">Local<br>Ecosystem</h1>
+            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; margin-top: -100px;">Local<br>Ecosystem</h1>
             <p class="hero-subtitle" style="font-size:1.3rem;">
             A topological view of your immediate<br>peers and accessible mentors.
             </p>""", unsafe_allow_html=True)
@@ -315,7 +317,7 @@ def render_teacher_view(df):
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         
     with right_col:
-        st.markdown(f"<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Ecosystem Snapshot: {teacher_region}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='color: #44433E; font-family: Montserrat, sans-serif; margin-top: -100px;'>Ecosystem Snapshot: {teacher_region}</h3>", unsafe_allow_html=True)
         
         regional_df = df[df['region'] == teacher_region].copy()
 
@@ -330,14 +332,14 @@ def render_teacher_view(df):
         # Display localized metrics
         mc1, mc2 = st.columns(2)
         mc1.markdown(f"""
-        <div class="white-metric-card" style="border-left: 4px solid #10B981;">
+        <div class="white-metric-card" style="border-left: 4px solid #10B981; margin-top: -50px;">
             <div class="wm-label">Available Local Legends</div>
             <div class="wm-value" style="color: #10B981;">{veteran_count}</div>
         </div>
         """, unsafe_allow_html=True)
 
         mc2.markdown(f"""
-        <div class="white-metric-card" style="border-left: 4px solid #3B82F6;">
+        <div class="white-metric-card" style="border-left: 4px solid #3B82F6; margin-top: -50px;">
             <div class="wm-label">Standard Peers</div>
             <div class="wm-value" style="color: #3B82F6;">{standard_count}</div>
         </div>

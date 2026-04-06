@@ -156,6 +156,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
     /* 4. Backdrop Blur (Optional but recommended for the glass look) */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    margin-top: -50px;
 }
 
 /* Matching the bold text style from your image */
@@ -163,6 +164,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
     font-weight: 800;
     color: #065f46;
     letter-spacing: 0.5px;
+
 }
     
     /* A.S.T.R.A. Critical Error Glass Alert */
@@ -191,6 +193,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     transition: none !important;
+    margin-top: -50px;
 }
 
 /* Make error titles pop like the "Profit" text */
@@ -274,6 +277,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
     background: rgba(224, 224, 224, 0.8);
     margin: 0 auto; /* Centers the line in the small 0.1 column */
     display: block;
+    margin-top: -100px;
 }
 
 /* Hide divider on mobile so it doesn't look like a random line between stacked rows */
@@ -316,7 +320,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
         with left_col:
             # Custom Large Title matching the image
             st.markdown("""
-    <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: 0;">
+    <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: -100px;">
         Intelligence<br>Analytics
     </h1>
     <p class="hero-subtitle" style="font-size:1.5rem;">
@@ -665,6 +669,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
             font-size: 14px; margin-bottom: 20px;
             box-shadow: 0 0 15px rgba(31, 173, 102, 0.2), 0 0 35px rgba(31, 173, 102, 0.15);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            margin-top: 50px;
         }
         .astra-alert-success strong { font-weight: 800; color: #065f46; letter-spacing: 0.5px; }
 
@@ -674,6 +679,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
             font-size: 14px; margin-bottom: 20px;
             box-shadow: 0 0 15px rgba(245, 158, 11, 0.2), 0 0 35px rgba(245, 158, 11, 0.15);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            margin-top: 50px;
         }
         .astra-alert-warning strong { font-weight: 800; color: #b45309; letter-spacing: 0.5px; text-transform: uppercase; }
 
@@ -683,6 +689,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
             font-size: 14px; margin-bottom: 20px;
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 0 0 35px rgba(59, 130, 246, 0.15);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            margin-top: -50px;
         }
         .astra-alert-info strong { font-weight: 800; color: #1e40af; letter-spacing: 0.5px; }
 
@@ -690,7 +697,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
 
         /* Custom Input Labels */
         .stSelectbox label, .stNumberInput label { font-family: 'Montserrat', sans-serif !important; color: #44433E !important; font-weight: 600 !important; }
-.divider { width: 1.5px; height: 100vh; background: rgba(224, 224, 224, 0.8); margin: 0 auto; display: block; }
+.divider { width: 1.5px; height: 100vh; background: rgba(224, 224, 224, 0.8); margin: 0 auto; display: block; margin-top: -100px; }
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .divider { display: none; }
@@ -717,7 +724,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
         with left_col:
             # Custom Large Title matching the image
             st.markdown("""
-                <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: 0;">
+                <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: -100px;">
                     Career<br>Skill-Tree
                 </h1>
                 <p class="hero-subtitle" style="font-size:1.5rem;">
@@ -742,7 +749,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
             
         with right_col:
             # Always display the instruction alert at the top of the right column
-            st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Mentorship Matcher</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif; margin-top: -100px;'>Mentorship Matcher</h3>", unsafe_allow_html=True)
             st.markdown("""
             <div class="astra-alert-info">
                 <strong>A.S.T.R.A DIRECTIVE:</strong> Based on your Region and Major, we identify <strong>'Local Legends'</strong> who have >12 years of specialized field experience to guide you.

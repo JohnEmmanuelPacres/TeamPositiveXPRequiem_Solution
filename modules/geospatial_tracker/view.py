@@ -63,6 +63,7 @@ def render(df):
         font-size: 14px; margin-bottom: 20px;
         box-shadow: 0 0 15px rgba(31, 173, 102, 0.2), 0 0 35px rgba(31, 173, 102, 0.15);
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        margin-top: -50px;
     }
     .astra-alert-success strong { font-weight: 700; color: #065f46; letter-spacing: 0.5px; }
     
@@ -72,6 +73,7 @@ def render(df):
         font-size: 14px; margin-bottom: 20px;
         box-shadow: 0 0 15px rgba(236, 19, 19, 0.25), 0 0 35px rgba(236, 19, 19, 0.18);
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        margin-top: -50px;
     }
     .astra-alert-error strong { font-weight: 700; color: #7f1d1d; letter-spacing: 0.5px; text-transform: uppercase; }
 
@@ -81,6 +83,7 @@ def render(df):
         font-size: 14px; margin-bottom: 20px; margin-top: 10px;
         box-shadow: 0 0 15px rgba(245, 158, 11, 0.2), 0 0 35px rgba(245, 158, 11, 0.15);
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        margin-top: -50px;
     }
     .astra-alert-warning strong { font-weight: 700; color: #F6B802; letter-spacing: 0.5px; text-transform: uppercase; }
 
@@ -88,7 +91,7 @@ def render(df):
     color: #666;
     font-family: 'Montserrat', sans-serif;
     font-size:18px;
-    margin-bottom: 130px; /* Big gap for desktop layout */
+    margin-bottom: 200px; /* Big gap for desktop layout */
 }
 
 /* Mobile View (Screens smaller than 768px) */
@@ -99,7 +102,7 @@ def render(df):
 }
     /* Custom Input Labels */
     .stSelectbox label, .stCheckbox label { font-family: 'Montserrat', sans-serif !important; color: #44433E !important; font-weight: 600 !important; }
-
+.divider { width: 1.5px; height: 100vh; background: rgba(224, 224, 224, 1); margin: 0 auto; display: block; margin-top: -100px; }
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
         div[role="radiogroup"] {
@@ -127,7 +130,7 @@ def render(df):
 
 }
     
-    .divider { width: 1.5px; height: 100vh; background: rgba(224, 224, 224, 1); margin: 0 auto; display: block; }
+    
     </style>
     """, unsafe_allow_html=True)
 
@@ -144,7 +147,7 @@ def render(df):
     
     with left_col:
         st.markdown("""
-            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.3rem; line-height: 1.1; margin-bottom: 0px; margin-top: 0; font-weight: 600;">
+            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.3rem; line-height: 1.1; margin-bottom: 0px; margin-top: -100px; font-weight: 600;">
         Deployment<br>Logistics Map
             </h1>
             <p class="hero-subtitle" style="font-size:1.5rem;">

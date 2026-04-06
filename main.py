@@ -20,15 +20,13 @@ st.markdown("""
     
     .block-container { padding-top: 0rem !important; }
     
-    iframe[title="navbar_component.custom_navbar"] {
-        position: fixed;
-        top: 0px; /* <--- CHANGE THIS FROM 20px TO 0px */
+    iframe[title="navbar_component.custom_navbar"] { /* <--- CHANGE THIS FROM 20px TO 0px */
         left: 0;
         width: 100vw;
-        height: 350px !important; 
+        height: 500px !important; 
         z-index: 9999;
         pointer-events: none; 
-        background-color: #FFF2DE;
+        background-color: #C41F1F;
     }
     
     /* Safely removes the ghost gap WITHOUT clipping the dropdown! */
@@ -39,6 +37,7 @@ st.markdown("""
         width: 100%;
         height: 0px !important;
         z-index: 9999;
+        background-color: #301FC4;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -76,13 +75,13 @@ if role == "Admin":
     modules = {
         "Intelligence Analytics": {"icon": "icon-cpu", "sub": None, "display": "Intelligence Analytics", "module": lambda df: __import__('modules.intelligence.view', fromlist=['']).render(df)},
         "Deployment Logistics Map": {"icon": "icon-map", "sub": None, "display": "Deployment Logistics Map", "module": lambda df: __import__('modules.geospatial_tracker.view', fromlist=['']).render(df)},
-        "Obsidian Mentorship Topology": {"icon": "icon-waypoints", "sub": "Topology", "display": "Obsidian Mentorship", "module": lambda df: __import__('modules.network_dashboard.view', fromlist=['']).render(df)},
-        "Ingestion Engine (Schema Healer)": {"icon": "icon-file-bar-chart-2", "sub": "(Schema Healer)", "display": "Ingestion Engine", "module": lambda df: __import__('modules.ingestion.view', fromlist=['']).render()}
+        "Obsidian Mentorship Topology": {"icon": "icon-waypoints", "sub": None, "display": "Obsidian Mentorship Topology", "module": lambda df: __import__('modules.network_dashboard.view', fromlist=['']).render(df)},
+        "Ingestion Engine (Schema Healer)": {"icon": "icon-file-bar-chart-2", "sub": None, "display": "Ingestion Engine Schema Healer", "module": lambda df: __import__('modules.ingestion.view', fromlist=['']).render()}
     }
 else:
     modules = {
-        "Career Skill-Tree (Analytics)": {"icon": "icon-cpu", "sub": "(Analytics)", "display": "Career Skill-Tree", "module": lambda df: __import__('modules.intelligence.view', fromlist=['']).render(df)},
-        "Local Ecosystem (Network)": {"icon": "icon-waypoints", "sub": "(Network)", "display": "Local Ecosystem", "module": lambda df: __import__('modules.network_dashboard.view', fromlist=['']).render_teacher_view(df)}
+        "Career Skill-Tree (Analytics)": {"icon": "icon-cpu", "sub": None, "display": "Career Skill-Tree Analytics", "module": lambda df: __import__('modules.intelligence.view', fromlist=['']).render(df)},
+        "Local Ecosystem (Network)": {"icon": "icon-waypoints", "sub": None, "display": "Local Ecosystem Network", "module": lambda df: __import__('modules.network_dashboard.view', fromlist=['']).render_teacher_view(df)}
     }
 
 if "current_nav" not in st.session_state or st.session_state.current_nav not in modules:

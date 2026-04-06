@@ -87,9 +87,9 @@ def inject_astra_theme():
     background-size: 200% 200%;
     min-height: 100vh;
     animation: gradientShift 15s ease infinite;
-}}
+    }}
 
-@keyframes gradientShift {{
+    @keyframes gradientShift {{
     0% {{
         background-position: 0% 50%;
     }}
@@ -99,17 +99,17 @@ def inject_astra_theme():
     100% {{
         background-position: 0% 50%;
     }}
-}}
-.logo-container {{
+    }}
+    .logo-container {{
             font-family: {astra_font};
-            font-size: 18px;
+            font-size: 25px;
             letter-spacing: 0.8em; 
             text-align: center;
             color: #333;
             padding: 20px 0 10px 0;
             width: 100%;
             text-transform: uppercase;
-            background-color: #FFF2DE;
+            margin-top: -50px;
         }}
 
 
@@ -218,16 +218,16 @@ def inject_astra_theme():
         </style>
     """, unsafe_allow_html=True)
     st.markdown("""
-<style>
-    /* Remove the red box-shadow/border when browser validation triggers */
-    input:invalid {
-        box-shadow: none !important;
-        border-color: rgba(0,0,0,0.1) !important;
-    }
-    /* Ensure Streamlit's own focus color takes priority */
-    .stTextInput input:focus {
-        border-color: #E0E0E0 !important; 
-        box-shadow: 0 0 0 1px #E0E0E0 !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+    <style>
+        /* Remove the red box-shadow/border when browser validation triggers */
+        input:invalid {
+            box-shadow: none !important;
+            border-color: rgba(0,0,0,0.1) !important;
+        }
+        /* Ensure Streamlit's own focus color takes priority */
+        .stTextInput input:focus {
+            border-color: #E0E0E0 !important; 
+            box-shadow: 0 0 0 1px #E0E0E0 !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)

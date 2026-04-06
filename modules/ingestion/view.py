@@ -55,6 +55,7 @@ def render():
         font-size: 14px; margin-bottom: 20px;
         box-shadow: 0 0 15px rgba(31, 173, 102, 0.2), 0 0 35px rgba(31, 173, 102, 0.15);
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        margin-top: -50px;
     }
     .astra-alert-success strong { font-weight: 800; color: #065f46; letter-spacing: 0.5px; }
     
@@ -64,6 +65,7 @@ def render():
         font-size: 14px; margin-bottom: 20px;
         box-shadow: 0 0 15px rgba(236, 19, 19, 0.25), 0 0 35px rgba(236, 19, 19, 0.18);
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        margin-top: -50px;
     }
     .astra-alert-error strong { font-weight: 800; color: #7f1d1d; letter-spacing: 0.5px; text-transform: uppercase; }
 
@@ -73,6 +75,7 @@ def render():
         font-size: 14px; margin-bottom: 20px;
         box-shadow: 0 0 15px rgba(245, 158, 11, 0.2), 0 0 35px rgba(245, 158, 11, 0.15);
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        margin-top: -50px;
     }
     .astra-alert-warning strong { font-weight: 800; color: #b45309; letter-spacing: 0.5px; text-transform: uppercase; }
 
@@ -82,11 +85,12 @@ def render():
         font-size: 14px; margin-bottom: 20px;
         box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 0 0 35px rgba(59, 130, 246, 0.15);
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        margin-top: -50px;
     }
     .astra-alert-info strong { font-weight: 800; color: #1e40af; letter-spacing: 0.5px; }
 
     .hero-subtitle{ color: #666; font-family: 'Montserrat', sans-serif; font-size:18px; margin-bottom: 30px; }
-.divider { width: 1.5px; height: 100vh; background: rgba(224, 224, 224, 0.8); margin: 0 auto; display: block; }
+.divider { width: 1.5px; height: 100vh; background: rgba(224, 224, 224, 0.8); margin: 0 auto; display: block; margin-top: -100px; }
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
         div[role="radiogroup"] {
@@ -116,7 +120,7 @@ def render():
 
     with left_col:
         st.markdown("""
-            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: 0;">
+            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: -100px;">
                 Ingestion<br>Engine
             </h1>
             <p class="hero-subtitle" style="font-size:1.5rem;">
