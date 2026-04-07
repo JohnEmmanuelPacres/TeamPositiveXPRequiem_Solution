@@ -3,7 +3,7 @@ import pydeck as pdk
 import pandas as pd
 from core.ui_components import render_header
 from modules.geospatial_tracker.map_engine import render_map
-from modules.geospatial_tracker.routing import find_nearest_teacher
+from modules.geospatial_tracker.routing import find_nearest_teacher, find_teachers_from_top_clusters
 from core.data_loader import REGION_COORDS
 from modules.geospatial_tracker.ai_assessment import find_vulnerability_epicenter, generate_ai_assessment
 from core.dataframe_schema import normalize_record_columns
@@ -285,8 +285,23 @@ div[role="radiogroup"] label:has(input:checked) {
             ].copy()
         
         # Now pass it to the actual engine
-        st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif; margin-top: 0;'>Regional Geospatial Map</h3>", unsafe_allow_html=True)
-        render_map(map_df, arcs_df=st.session_state.get('routing_arcs_df'))
+        col_map_title, col_map_toggle = st.columns([3, 1])
+        with col_map_title:
+            st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif; margin-top: 0;'>Regional Geospatial Map</h3>", unsafe_allow_html=True)
+        with col_map_toggle:
+            is_3d = st.toggle("3D Map", value=True)
+            
+        view_state = pdk.ViewState(
+            longitude=122.56, 
+            latitude=12.2, 
+            zoom=4.5, 
+            min_zoom=4, 
+            max_zoom=20, 
+            pitch=45 if is_3d else 0, 
+            bearing=0
+        )
+        
+        render_map(map_df, view_state=view_state, arcs_df=st.session_state.get('routing_arcs_df'))
         
         st.markdown("<br><h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Dispatch Routing Algorithm</h3>", unsafe_allow_html=True)
         
@@ -338,6 +353,22 @@ div[role="radiogroup"] label:has(input:checked) {
                     st.stop()
                     
             with st.spinner("Calculating geospatial routes..."):
+                import time
+                
+                # --- START GIMMICK / NETWORK MODULE CONNECTION ---
+                progress_text = "Initializing A.S.T.R.A. Dispatch Sequence..."
+                my_bar = st.progress(0, text=progress_text)
+                
+                time.sleep(0.5)
+                my_bar.progress(30, text="Establishing secure handshake with Network Simulator...")
+                
+                time.sleep(0.5)
+                my_bar.progress(60, text="Syncing coordinates with active node graphs...")
+                
+                time.sleep(0.5)
+                my_bar.progress(90, text="Computing optimal geospatial trajectories...")
+                # --- END GIMMICK ---
+
                 if use_ai_epicenter and epicenter_coords:
                     target_lat, target_lon = epicenter_coords
                     routing_msg = f"Routing Computed from {source_region} to AI Epicenter in {target_region}!"
@@ -346,7 +377,11 @@ div[role="radiogroup"] label:has(input:checked) {
                     routing_msg = f"Routing Computed from {source_region} to Regional Anchor {target_region}!"
                     
                 query_subject = None if subject == "Any" else subject
-                results = find_nearest_teacher(df_internal, target_lat, target_lon, query_subject, source_region=source_region)
+                
+                if source_region != "Global Nearest (Any)":
+                    results = find_teachers_from_top_clusters(df_internal, source_region, target_lat, target_lon, query_subject)
+                else:
+                    results = find_nearest_teacher(df_internal, target_lat, target_lon, query_subject, source_region="Global Nearest (Any)")
                 
                 # Construct Arc Data and Update State
                 arcs_data = []
@@ -369,12 +404,25 @@ div[role="radiogroup"] label:has(input:checked) {
                         
                     if t_id:
                         # Dynamically extract teacher and inject into new region to change fragility stats live
-                        updated_df = deploy_teacher(updated_df, t_id, target_region)
+                        updated_df = deploy_teacher(
+                            updated_df, 
+                            t_id, 
+                            target_region, 
+                            target_lat=target_lat, 
+                            target_lon=target_lon
+                        )
                 
                 st.session_state['working_df'] = updated_df
                 st.session_state['routing_arcs_df'] = pd.DataFrame(arcs_data)
                 st.session_state['dispatch_results'] = results
                 st.session_state['dispatch_msg'] = routing_msg
+                
+                my_bar.progress(100, text="Dispatch Complete! Network nodes successfully updated.")
+                time.sleep(0.5)
+                my_bar.empty()
+                st.toast("⚡ Nodes successfully synced with Network Dashboard!", icon="📡")
+                st.balloons()
+                
                 st.rerun()
                 
         if st.session_state.get('dispatch_results') is not None:

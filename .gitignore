@@ -12,3 +12,5 @@ __pycache__/
 
 # Data files (optional - ignore if you don't want to track 3,500+ row CSVs)
 Dataset/STAR_Integrated_Data_*.csv
+
+.github/
