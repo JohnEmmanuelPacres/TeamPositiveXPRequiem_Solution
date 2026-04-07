@@ -1,0 +1,19 @@
+[theme]
+# You can change the base between "light" and "dark" mode.
+base = "light"
+
+# You can also customize specific colors if you want to override the base theme.
+# Uncomment the following lines to define a custom color palette:
+
+# primaryColor = "#1E3A8A"
+# backgroundColor = "#ffffff"
+# secondaryBackgroundColor = "#f0f2f6"
+# textColor = "#262730"
+# font = "sans serif"
+
+# --- Example Dark Mode Configuration ---
+# base = "dark"
+# primaryColor = "#F3F4F6"
+# backgroundColor = "#0e1117"
+# secondaryBackgroundColor = "#262730"
+# textColor = "#fafafa"
