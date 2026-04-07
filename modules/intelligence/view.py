@@ -71,7 +71,7 @@ div[role="radiogroup"] label:has(input:checked) {
     }
 
     div[role="radiogroup"] label:has(input:checked) p {
-        color: #000 !important; 
+        color: #222 !important; 
         font-size: 18px; 
         border-left: 3px solid #000 !important; /* Forces the line to stay */
         padding-left: 15px; 
@@ -229,6 +229,30 @@ div[role="radiogroup"] label:has(input:checked) {
         font-family: 'Inter', sans-serif !important;
         font-size: 13px !important;
         font-weight: 500 !important;
+    }
+
+    /* --- SLIDER WIDGET STYLING --- */
+    
+    /* 1. The Slider Label ("Capacity Weight", etc.) */
+    div[data-testid="stSlider"] div[data-testid="stWidgetLabel"] p {
+        font-family: 'Montserrat', sans-serif !important;
+        color: #44433E !important; /* Dark Gray */
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+
+    /* 2. The Slider Numbers (0.0, 1.0, and the floating thumb value) */
+    div[data-testid="stSlider"] div {
+        font-family: 'Inter', sans-serif !important;
+        color: #6B7280 !important; /* Cool Gray */
+        font-weight: 500 !important;
+    }
+    
+    /* 3. Force the floating thumb value to be a bit darker so it's easy to read */
+    div[data-baseweb="slider"] div[role="slider"] {
+        color: #111827 !important; /* Deep Black */
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
     }
 
 /* Make error titles pop like the "Profit" text */
@@ -706,9 +730,6 @@ div[role="radiogroup"] label:has(input:checked) {
                         st.plotly_chart(fig_trend, use_container_width=True, theme=None)
                         st.markdown("<b3 style='color: #444; font-family: Montserrat, sans-serif;'>*Dashed lines represent probabilistic OLS linear projections based on baseline STAR programmatic ROI.*</b3>", unsafe_allow_html=True)
                 
-                        st.plotly_chart(fig_trend, use_container_width=True)
-                        st.caption("*Dashed lines represent probabilistic OLS linear projections based on baseline STAR programmatic ROI.*")
-                        
             # ============ TAB 6: Algorithmic Safeguards ============
             elif tab_selection == "Algorithmic Safeguards":
                 st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Algorithmic Safeguard Panel</h3>", unsafe_allow_html=True)
@@ -722,9 +743,14 @@ div[role="radiogroup"] label:has(input:checked) {
                 try:
                     with st.spinner("Calibrating Simulation Matrix..."):
                         test_scored = append_fragility_scores(df, w1, w2, w3)
-                        st.success(f"System Optimized! Final Weight Sum: {sum([w1, w2, w3]):.2f}")
-                        
-                        st.markdown("**Simulated Fragility Dataframe Output**")
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown(f"""
+                <div class="astra-alert-success">
+                    <strong>System Optimized!</strong> Final Weight Sum: {sum([w1, w2, w3]):.2f}
+                </div>
+                """, unsafe_allow_html=True)
+                        st.markdown("<h5 style='color: #44433E; font-family: Montserrat, sans-serif;'>Simulated Fragility Dataframe Output</h5>", unsafe_allow_html=True)
                         st.dataframe(test_scored[['teacher_id', 'region', 'subject_taught', 'years_experience', 'calculated_fragility_score']], use_container_width=True)
                 except ValueError as e:
                     st.error(f"Security Safeguard Triggered: {e}")
