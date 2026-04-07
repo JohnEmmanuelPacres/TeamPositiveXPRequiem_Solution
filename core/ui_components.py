@@ -5,7 +5,7 @@ import base64
 def set_page_config():
     st.set_page_config(
         page_title="DSS Platform - Requiem",
-        page_icon="🌍",
+        page_icon="⭐️",
         layout="wide",
         initial_sidebar_state="expanded"
     )
@@ -83,7 +83,7 @@ def inject_astra_theme():
 
         /* 1. Background Fade */
         [data-testid="stAppViewContainer"] {{
-    background: linear-gradient(135deg, #FFF2DE, #e8f0e8, #FFD5D5);
+    background: linear-gradient(135deg, #FFDEC8, #e8f0e8, #FFD5D5);
     background-size: 200% 200%;
     min-height: 100vh;
     animation: gradientShift 15s ease infinite;
