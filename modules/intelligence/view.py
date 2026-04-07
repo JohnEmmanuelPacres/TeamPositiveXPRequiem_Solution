@@ -310,7 +310,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                 frag_delta = 0
                 risk_delta = 0
                 
-        novice_df = df_clustered[df_clustered['Cohort_Name'] == 'Novice Pool']
+        novice_df = df_clustered[df_clustered['cohort_name'] == 'Novice Pool']
         novice_count = len(novice_df)
         target_region = novice_df['Region'].mode()[0] if not novice_df.empty else 'NCR'
         
@@ -330,7 +330,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
             
             # Vertical Menu (Radio buttons styled via CSS to look like tabs)
             tab_selection = st.radio(
-                "Navigation",["Overview Dashboard", "Cohort Analysis", "Regional Heatmap", "Mentorship Network", "Longitudinal Forecast"],
+                "Navigation",["Overview Dashboard", "Cohort Analysis", "Regional Heatmap", "Mentorship Network", "Longitudinal Forecast", "Algorithmic Safeguards"],
                 label_visibility="collapsed"
             )
 
@@ -644,6 +644,26 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                         
                         st.plotly_chart(fig_trend, use_container_width=True)
                         st.caption("*Dashed lines represent probabilistic OLS linear projections based on baseline STAR programmatic ROI.*")
+                        
+            # ============ TAB 6: Algorithmic Safeguards ============
+            elif tab_selection == "Algorithmic Safeguards":
+                st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Algorithmic Safeguard Panel</h3>", unsafe_allow_html=True)
+                st.markdown("<p style='font-family: Montserrat, sans-serif; color: #666;'>Tune the components of the Fragility Index. Weights must sum to 1.0, and variance from baseline cannot exceed 10%.</p>", unsafe_allow_html=True)
+                
+                col_w1, col_w2, col_w3 = st.columns(3)
+                w1 = col_w1.slider("Capacity Weight", 0.0, 1.0, 0.40, 0.01)
+                w2 = col_w2.slider("Experience Weight", 0.0, 1.0, 0.30, 0.01)
+                w3 = col_w3.slider("Mismatch Weight", 0.0, 1.0, 0.30, 0.01)
+
+                try:
+                    with st.spinner("Calibrating Simulation Matrix..."):
+                        test_scored = append_fragility_scores(df, w1, w2, w3)
+                        st.success(f"System Optimized! Final Weight Sum: {sum([w1, w2, w3]):.2f}")
+                        
+                        st.markdown("**Simulated Fragility Dataframe Output**")
+                        st.dataframe(test_scored[['teacher_id', 'region', 'subject_taught', 'years_experience', 'calculated_fragility_score']], use_container_width=True)
+                except ValueError as e:
+                    st.error(f"Security Safeguard Triggered: {e}")
 
     else:
         # Teacher View
