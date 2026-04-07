@@ -81,7 +81,8 @@ if role == "Admin":
 else:
     modules = {
         "Career Skill-Tree (Analytics)": {"icon": "icon-cpu", "sub": None, "display": "Career Skill-Tree Analytics", "module": lambda df: __import__('modules.intelligence.view', fromlist=['']).render(df)},
-        "Local Ecosystem (Network)": {"icon": "icon-waypoints", "sub": None, "display": "Local Ecosystem Network", "module": lambda df: __import__('modules.network_dashboard.view', fromlist=['']).render_teacher_view(df)}
+        "Local Ecosystem (Network)": {"icon": "icon-waypoints", "sub": None, "display": "Local Ecosystem Network", "module": lambda df: __import__('modules.network_dashboard.view', fromlist=['']).render_teacher_view(df)},
+        "Certification Progress": {"icon": "icon-award", "sub": None, "display": "Certification Progress Tracker", "module": lambda df: __import__('modules.intelligence.view', fromlist=['']).render_certification_tracker(df)}
     }
 
 if "current_nav" not in st.session_state or st.session_state.current_nav not in modules:
