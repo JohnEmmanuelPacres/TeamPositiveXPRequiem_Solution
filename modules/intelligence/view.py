@@ -65,35 +65,49 @@ div[role="radiogroup"] label p {
 
 /* 4. Active State: Bigger, Darker, and the Accent Line 
    This matches the interaction pattern from the previous request. */
-div[role="radiogroup"] label[data-checked="True"] {
-    background-color: rgba(0,0,0,0.03); /* Extremely subtle fill to define the shape */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.02); /* Soft depth */
-    transform: scale(1.05); /* Scales the entire button up by 5% */
-}
+div[role="radiogroup"] label:has(input:checked) {
+        transform: scale(1);
+        transition: all 0.2s ease; 
+    }
 
-div[role="radiogroup"] label[data-checked="True"] p {
-    color: #000 !important; /* Sharp, pure black */
-    font-size: 18px; /* Physically larger font */
-    border-left: 3px solid #000; /* Bold accent line from design image */
-    padding-left: 15px; /* Adds space after the line */
-}
+    div[role="radiogroup"] label:has(input:checked) p {
+        color: #222 !important; 
+        font-size: 18px; 
+        border-left: 3px solid #000 !important; /* Forces the line to stay */
+        padding-left: 15px; 
+    }
 
-/* Optional: Slight hover state for better usability */
-div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
-    color: #333 !important;
-    border-left: 3px solid rgba(0,0,0,0.2);
-}
+    /* Optional: Slight hover state (only applies if NOT checked) */
+    div[role="radiogroup"] label:not(:has(input:checked)):hover p {
+        color: #333 !important;
+        border-left: 3px solid rgba(0,0,0,0.2) !important;
+    }
 
     /* Custom White Metric Cards (Bottom Right) */
-    .white-metric-card {
-        background-color: rgb(255, 255, 255, 0.7);
+   .white-metric-card {
+        background-color: rgba(255, 255, 255, 0.6); /* Slightly more opaque */
         padding: 20px;
         border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+        
+        /* THE GLOW EFFECT */
+        /* Layer 1: Soft dark shadow for depth underneath */
+        /* Layer 2: Wide, soft white spread for the ambient outer glow */
+        box-shadow: 
+            0 8px 20px rgba(0, 0, 0, 0.04), 
+            0 0 15px rgba(255, 255, 255, 0.7); 
+            
+        /* Crisp edge highlights to make the glow pop */
+        border: 1px solid rgba(255, 255, 255, 1); 
+        
+        /* Frosted glass blur */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         height: 90%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .wm-label {
     font-family: 'Montserrat', sans-serif;
@@ -195,6 +209,51 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
     transition: none !important;
     margin-top: -50px;
 }
+ [data-testid="stMetricLabel"] {
+        font-family: 'Montserrat', sans-serif !important;
+        color: #6B7280 !important; /* Cool gray to match your UI */
+        font-size: 15px !important;
+        font-weight: 600 !important;
+    }
+
+    /* 2. The Main Number/Value (e.g., "2.5:1") */
+    [data-testid="stMetricValue"] {
+        font-family: 'Montserrat', sans-serif !important;
+        color: #111827 !important; /* Deep dark gray/black */
+        font-size: 32px !important;
+        font-weight: 700 !important;
+    }
+
+    /* 3. The Delta/Sub-text (e.g., "12% of Workforce") */
+    [data-testid="stMetricDelta"] {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+    }
+
+    /* --- SLIDER WIDGET STYLING --- */
+    
+    /* 1. The Slider Label ("Capacity Weight", etc.) */
+    div[data-testid="stSlider"] div[data-testid="stWidgetLabel"] p {
+        font-family: 'Montserrat', sans-serif !important;
+        color: #44433E !important; /* Dark Gray */
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+
+    /* 2. The Slider Numbers (0.0, 1.0, and the floating thumb value) */
+    div[data-testid="stSlider"] div {
+        font-family: 'Inter', sans-serif !important;
+        color: #6B7280 !important; /* Cool Gray */
+        font-weight: 500 !important;
+    }
+    
+    /* 3. Force the floating thumb value to be a bit darker so it's easy to read */
+    div[data-baseweb="slider"] div[role="slider"] {
+        color: #111827 !important; /* Deep Black */
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
+    }
 
 /* Make error titles pop like the "Profit" text */
 .astra-alert-error strong {
@@ -214,6 +273,15 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
     font-size:18px;
     margin-bottom: 130px; /* Big gap for desktop layout */
 }
+.astra-alert-info {
+            background-color: rgba(219, 234, 254, 0.5); border: 1.5px solid rgba(59, 130, 246, 0.6);
+            padding: 20px; border-radius: 12px; color: #1E3A8A; font-family: 'Montserrat', sans-serif;
+            font-size: 14px; margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 0 0 35px rgba(59, 130, 246, 0.15);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .astra-alert-info strong { font-weight: 800; color: #1e40af; letter-spacing: 0.5px; }
+
 
 /* Mobile View (Screens smaller than 768px) */
 @media (max-width: 768px) {
@@ -221,56 +289,44 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
         margin-bottom: 20px !important;  /* Optional: shrink text slightly for mobile too */
     }
 }
-/* --- Horizontal Tab Navigation (Mobile) --- */
 @media (max-width: 768px) {
-    /* 1. Force the container into a single horizontal line */
-    div[role="radiogroup"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important; /* Prevents tabs from stacking */
-        overflow-x: auto; /* Allows swiping if tabs are wide */
-        gap: 20px !important;
-        margin-top: 20px !important;
-        margin-left: 0 !important;
-        padding-bottom: 5px;
-        border-bottom: 1px solid rgba(0,0,0,0.05); /* Subtle baseline */
+        div[role="radiogroup"] {
+            display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; 
+            overflow-x: auto; gap: 20px !important; margin-top: 20px !important; margin-left: 0 !important;
+            padding-bottom: 5px; border-bottom: 1px solid rgba(0,0,0,0.05); 
+            margin-bottom: 20px !important; border-left: none !important;
+        }
+        div[role="radiogroup"]::-webkit-scrollbar { display: none; }
+        div[role="radiogroup"] label {
+            border-left: none !important; padding: 0 !important; background-color: transparent !important; white-space: nowrap !important;
+        }
+        div[role="radiogroup"] label p {
+            font-size: 12px !important; letter-spacing: 1px; padding-left: 0 !important;
+            padding-bottom: 8px !important; border-left: none !important; border-bottom: 3px solid transparent; 
+            transition: all 0.2s ease;
+        }
+        /* Mobile Active Tab State (FIXED) */
+        div[role="radiogroup"] label:has(input:checked) p {
+            color: #000 !important; border-left: none !important; border-bottom: 3px solid #000 !important; 
+        }
+        div[role="radiogroup"] label:has(input:checked) {
+            transform: scale(1) !important; box-shadow: none !important;
+        }
+        div[role="radiogroup"] label:not(:has(input:checked)):hover p {
+            border-left: none !important;
+        }
     }
-
-    /* Hide the scrollbar but keep the functionality (Chrome/Safari) */
-    div[role="radiogroup"]::-webkit-scrollbar {
-        display: none;
+    [data-testid="stDataFrame"] {
+        font-family: 'Montserrat', sans-serif !important;
     }
-
-    /* 2. Style labels as individual tabs */
-    div[role="radiogroup"] label {
-        padding: 0 !important;
-        background-color: transparent !important;
-        white-space: nowrap !important; /* Keeps text on one line */
+    [data-testid="stDataFrame"] div[data-testid="stDataFrameResizable"] {
+        background-color: rgba(255, 255, 255, 0.7) !important;
     }
-
-    /* 3. The Text and Bottom Accent */
-    div[role="radiogroup"] label p {
-        font-size: 12px !important; /* Smaller for mobile fit */
-        letter-spacing: 1px;
-        padding-left: 0 !important;
-        padding-bottom: 8px !important; /* Space above the line */
-        border-left: none !important; /* Kill the desktop vertical line */
-        border-bottom: 3px solid transparent; /* Placeholder for active state */
-        transition: all 0.2s ease;
+    /* Forces header text to be dark */
+    th.col_heading {
+        color: #333333 !important; 
+        font-family: 'Montserrat', sans-serif !important;
     }
-
-    /* 4. Active Tab State */
-    div[role="radiogroup"] label[data-checked="True" i] p {
-        color: #000 !important;
-        border-bottom: 3px solid #000 !important; /* The horizontal "active" line */
-    }
-
-    /* 5. Scale down the "pop" effect for mobile touch */
-    div[role="radiogroup"] label[data-checked="True" i] {
-        transform: scale(1) !important; 
-        box-shadow: none !important;
-    }
-}
 .divider {
     width: 1.5px;
     height: 100vh; /* Uses viewport height so it stretches down the page */
@@ -369,15 +425,18 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                 fig_dist.update_layout(
                     plot_bgcolor='rgba(0, 0, 0, 0)', # Beige chart box
                     paper_bgcolor='rgba(0, 0, 0, 0)',
-                    font=dict(color='#333'), # Dark font for light theme
+                    font=dict(
+                        family="Montserrat, sans-serif", 
+                        size=14,                                                
+                        color='#333'                                     
+                    ), 
                     xaxis=dict(automargin=True, gridcolor='rgba(0,0,0,0.05)'),
                     yaxis=dict(automargin=True, gridcolor='rgba(0,0,0,0.05)'),
                     showlegend=False,
                     margin=dict(l=20, r=20, t=20, b=20)
                 )
-                st.plotly_chart(fig_dist, use_container_width=True)
+                st.plotly_chart(fig_dist, use_container_width=True, theme=None)
                 
-                st.markdown("<br>", unsafe_allow_html=True)
                 
                 # The 3 White Custom Cards placed under the chart
                 mc1, mc2, mc3 = st.columns(3)
@@ -450,10 +509,15 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                     legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
-                    font=dict(color='#333'), # Light theme compatible font
+                    font=dict(
+                        family="Montserrat, sans-serif",
+                        size=13,                         # Adjusted size
+                        color='#333'                  # Deep black color
+                    ),
                     margin=dict(t=30, b=30, l=30, r=30)
                 )
-                st.plotly_chart(fig, use_container_width=True)
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.plotly_chart(fig, use_container_width=True, theme=None)
             
             # ============ TAB 3: Regional Heatmap ============
             elif tab_selection == "Regional Heatmap":
@@ -477,16 +541,26 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                 fig_heat.update_layout(
                     plot_bgcolor='rgba(255,255,255,0.7)',
                     paper_bgcolor='rgba(0,0,0,0)',
-                    font=dict(color='#333'),
+                    font=dict(
+                        family="Montserrat, sans-serif",
+                        size=12,
+                        color='#333'
+                    ),
                     xaxis=dict(title="Cohort Class", automargin=True),
                     yaxis=dict(title="Region", automargin=True),
                     margin=dict(l=10, r=10, t=30, b=10)
                 )
-                st.plotly_chart(fig_heat, use_container_width=True)
-                
-                st.markdown("**Cohort Distribution by Region**")
-                table_data = heatmap_data.sort_values(by = 'Novice Pool', ascending=False) if 'Novice Pool' in heatmap_data.columns else heatmap_data
-                st.dataframe(table_data, use_container_width=True)        
+                st.plotly_chart(fig_heat, use_container_width=True, theme=None)
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown("<h5 style='color: #44433E; font-family: Montserrat, sans-serif;'>Cohort Distribution by Region</h5>", unsafe_allow_html=True)
+                table_data = heatmap_data.sort_values(by='Novice Pool', ascending=False) if 'Novice Pool' in heatmap_data.columns else heatmap_data
+                styled_table = table_data.style.set_properties(**{
+                    'color': '#333333',                            # Forces text to be dark gray
+                    'background-color': 'rgba(255, 255, 255, 0.7)', # Matches your custom glass cards
+                    'font-family': 'Montserrat, sans-serif',       # Applies your custom font
+                    'border-color': '#E5E7EB'
+                })
+                st.dataframe(styled_table, use_container_width=True)        
                 
             # ============ TAB 4: Mentorship Network ============
             elif tab_selection == "Mentorship Network":
@@ -497,9 +571,9 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                 novice_count = len(df_clustered[df_clustered['cohort_name'] == 'Novice Pool'])
                 
                 col_ment1, col_ment2, col_ment3 = st.columns(3)
-                col_ment1.markdown(f"<div class='white-metric-card' style='border-left:4px solid #10B981;'><div class='wm-label'>Veteran Legends</div><div class='wm-value' style='color:#10B981;'>{veteran_count}</div></div>", unsafe_allow_html=True)
-                col_ment2.markdown(f"<div class='white-metric-card' style='border-left:4px solid #3B82F6;'><div class='wm-label'>Core Tier</div><div class='wm-value' style='color:#3B82F6;'>{core_count}</div></div>", unsafe_allow_html=True)
-                col_ment3.markdown(f"<div class='white-metric-card' style='border-left:4px solid #F43F5E;'><div class='wm-label'>Novice Pool</div><div class='wm-value' style='color:#F43F5E;'>{novice_count}</div></div>", unsafe_allow_html=True)
+                col_ment1.markdown(f"<div class='white-metric-card' style=' solid #10B981;'><div class='wm-label'>Veteran Legends</div><div class='wm-value' style='color:#10B981; font-size: 40px;'>{veteran_count}</div></div>", unsafe_allow_html=True)
+                col_ment2.markdown(f"<div class='white-metric-card' style=' solid #3B82F6;'><div class='wm-label'>Core Tier</div><div class='wm-value' style='color:#3B82F6; font-size: 40px;'>{core_count}</div></div>", unsafe_allow_html=True)
+                col_ment3.markdown(f"<div class='white-metric-card' style=' solid #F43F5E;'><div class='wm-label'>Novice Pool</div><div class='wm-value' style='color:#F43F5E; font-size: 40px;'>{novice_count}</div></div>", unsafe_allow_html=True)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 col_m1, col_m2, col_m3 = st.columns(3)
@@ -530,7 +604,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                     col_m3.metric("Highest Mentorship Deficit", worst_region, f"{worst_ratio} Novices/Vet", delta_color="inverse", help="Region most in need of veteran deployments")
                 
                 st.markdown("---")
-                st.markdown("### Cohort Experience vs. Age Distribution")
+                st.markdown("<h4 style='color: #44433E; font-family: Montserrat, sans-serif;'>Cohort Experience vs. Age Distribution</h4>", unsafe_allow_html=True)
                 
                 fig_scatter = go.Figure()
                 colors = {"Novice Pool": "#F43F5E", "Core Tier": "#3B82F6", "Veteran Legends": "#10B981"}
@@ -551,20 +625,27 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                 fig_scatter.update_layout(
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
-                    font=dict(color='#333'),
+                    font=dict(
+                        family="Montserrat, sans-serif",
+                        size=12,
+                        color='#333'
+                    ),
                     xaxis=dict(title="Teacher Age", gridcolor='rgba(0, 0, 0, 0.05)', automargin=True),
                     yaxis=dict(title="Years of Experience", gridcolor='rgba(0, 0, 0, 0.05)', automargin=True),
                     hovermode='closest',
-                    legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
+                    legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5),
                     margin=dict(l=10, r=10, t=30, b=10)
                 )
-                st.plotly_chart(fig_scatter, use_container_width=True)
+                st.plotly_chart(fig_scatter, use_container_width=True, theme=None)
             
             # ============ TAB 5: Longitudinal Forecast ============
             elif tab_selection == "Longitudinal Forecast":
                 st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Longitudinal Forecast (2022-2027)</h3>", unsafe_allow_html=True)
-                st.info("Analyzing historical fragility and capacity-building metrics to forecast 2027 trajectory using linear projection.")
-                
+                st.markdown("""
+            <div class="astra-alert-info">
+                Analyzing historical fragility and capacity-building metrics to forecast 2027 trajectory using linear projection.
+            </div>
+            """, unsafe_allow_html=True)
                 with st.spinner("Compiling Historical Telemetry..."):
                     import pandas as pd
                     import numpy as np
@@ -634,17 +715,21 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                         fig_trend.update_layout(
                             plot_bgcolor='rgba(0,0,0,0)',
                             paper_bgcolor='rgba(0,0,0,0)',
-                            font=dict(color='#333'),
+                            font=dict(
+                                family="Montserrat, sans-serif",
+                                size=12,
+                                color='#333'
+                            ),  
                             xaxis=dict(title="Year Timeline", tickmode='linear', dtick=1, automargin=True, gridcolor='rgba(0,0,0,0.05)'),
                             yaxis=dict(title="Calculated Volume / Score", automargin=True, gridcolor='rgba(0,0,0,0.05)'),
                             hovermode='x unified',
-                            legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5),
+                            legend=dict(orientation="h", yanchor="bottom", y=-0.5, xanchor="center", x=0.5),
                             margin=dict(l=10, r=10, t=30, b=10)
                         )
                         
-                        st.plotly_chart(fig_trend, use_container_width=True)
-                        st.caption("*Dashed lines represent probabilistic OLS linear projections based on baseline STAR programmatic ROI.*")
-                        
+                        st.plotly_chart(fig_trend, use_container_width=True, theme=None)
+                        st.markdown("<b3 style='color: #444; font-family: Montserrat, sans-serif;'>*Dashed lines represent probabilistic OLS linear projections based on baseline STAR programmatic ROI.*</b3>", unsafe_allow_html=True)
+                
             # ============ TAB 6: Algorithmic Safeguards ============
             elif tab_selection == "Algorithmic Safeguards":
                 st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Algorithmic Safeguard Panel</h3>", unsafe_allow_html=True)
@@ -658,9 +743,14 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                 try:
                     with st.spinner("Calibrating Simulation Matrix..."):
                         test_scored = append_fragility_scores(df, w1, w2, w3)
-                        st.success(f"System Optimized! Final Weight Sum: {sum([w1, w2, w3]):.2f}")
-                        
-                        st.markdown("**Simulated Fragility Dataframe Output**")
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown(f"""
+                <div class="astra-alert-success">
+                    <strong>System Optimized!</strong> Final Weight Sum: {sum([w1, w2, w3]):.2f}
+                </div>
+                """, unsafe_allow_html=True)
+                        st.markdown("<h5 style='color: #44433E; font-family: Montserrat, sans-serif;'>Simulated Fragility Dataframe Output</h5>", unsafe_allow_html=True)
                         st.dataframe(test_scored[['teacher_id', 'region', 'subject_taught', 'years_experience', 'calculated_fragility_score']], use_container_width=True)
                 except ValueError as e:
                     st.error(f"Security Safeguard Triggered: {e}")
@@ -689,7 +779,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
             font-size: 14px; margin-bottom: 20px;
             box-shadow: 0 0 15px rgba(31, 173, 102, 0.2), 0 0 35px rgba(31, 173, 102, 0.15);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            margin-top: 50px;
+            margin-top: 20px;
         }
         .astra-alert-success strong { font-weight: 800; color: #065f46; letter-spacing: 0.5px; }
 
@@ -729,6 +819,48 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
     border-radius: 8px !important;
 
 }
+/* --- INPUT LABELS (Your Region, Specialization, etc.) --- */
+    div[data-testid="stWidgetLabel"] p {
+        font-family: 'Montserrat', sans-serif !important;
+        color: #44433E !important; /* Dark Gray */
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+
+    /* --- INPUT BOXES & DROPDOWNS (The clickable area & text) --- */
+    div[data-baseweb="select"] span, 
+    div[data-baseweb="input"] input {
+        font-family: 'Inter', sans-serif !important;
+        color: #111827 !important; /* Deep black for input text */
+        font-size: 14px !important;
+        font-weight: 500 !important;
+    }
+
+    /* Make the background of the inputs white with a subtle border */
+    div[data-baseweb="select"] > div, 
+    div[data-baseweb="input"] > div {
+        background-color: #FFFFFF !important;
+        border: 1px solid #D1D5DB !important;
+        border-radius: 8px !important;
+    }
+
+    /* --- PRIMARY BUTTON ("Find Local Mentors") --- */
+    div.stButton > button[kind="primary"] {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        letter-spacing: 0.5px !important;
+        
+        /* You can change these colors! Currently set to ASTRA Green */
+        background-color: #000000 !important; 
+        color: #FFFFFF !important;
+        
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 10px 24px !important;
+        transition: all 0.3s ease !important;
+        margin-bottom: 100px;
+    }
         </style>
         """, unsafe_allow_html=True)
 
@@ -752,6 +884,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                 </p>
             """, unsafe_allow_html=True)
             
+            st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("<h4 style='color: #44433E; font-family: Montserrat, sans-serif; font-size: 1.2rem;'>Search Parameters</h4>", unsafe_allow_html=True)
             
             # Inputs stacked vertically in the left column for better fit
@@ -762,6 +895,8 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
             st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Find Local Mentors", type="primary", use_container_width=True):
                 st.session_state['mentor_search_triggered'] = True
+            
+            st.markdown("<br>", unsafe_allow_html=True)
 
         with div_col:
             # Vertical Line CSS hook
@@ -788,7 +923,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Top 3 Recommended Mentors</h3>", unsafe_allow_html=True)
+                    st.markdown("<h5 style='color: #44433E; font-family: Montserrat, sans-serif;'>Top 3 Recommended Mentors</h5>", unsafe_allow_html=True)
                     mentor_cols = st.columns(len(mentors.head(3)))
                     
                     for i, row_data in enumerate(mentors.head(3).iterrows()):
@@ -813,7 +948,7 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                             </div>
                             """, unsafe_allow_html=True)
                     
-                    st.markdown("<br><h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Skill-Tree Compatibility (You vs. Top Mentor)</h3>", unsafe_allow_html=True)
+                    st.markdown("<br><h4 style='color: #44433E; font-family: Montserrat, sans-serif;'>Skill-Tree Compatibility (You vs. Top Mentor)</h4>", unsafe_allow_html=True)
                     
                     top_mentor = mentors.iloc[0]
                     categories =['Subject Alignment', 'Mentorship XP', 'Resilience', 'Content Mastery']
@@ -856,10 +991,14 @@ div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
                         legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5), 
                         plot_bgcolor='rgba(0,0,0,0)',
                         paper_bgcolor='rgba(0,0,0,0)',
-                        font=dict(color='#333'),
+                        font=dict(
+                                family="Montserrat, sans-serif",
+                                size=12,
+                                color='#333'
+                            ), 
                         margin=dict(t=30, b=30, l=10, r=10) 
                     )
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, use_container_width=True, theme=None)
 
                     if len(mentors) > 3:
                         with st.expander(f"View Full Directory: {len(mentors) - 3} Other Applicable Mentors in {region}"):

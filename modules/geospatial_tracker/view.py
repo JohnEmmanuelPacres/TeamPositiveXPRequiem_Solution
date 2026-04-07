@@ -23,31 +23,92 @@ def render(df):
     /* Force Light Beige Background to match image */
     .stApp { background-color: #F1EFE9 !important; }
     
-    /* --- Vertical Tab Navigation Styling --- */
-    div[role="radiogroup"] > label > div:first-child { display: none !important; }
-    div[role="radiogroup"] { gap: 12px; margin-top: 50px; margin-left: -30px; }
-    div[role="radiogroup"] label {
-        display: flex; align-items: center; background-color: transparent;
-        border-radius: 8px; padding: 5px 20px; margin: 0 !important;
-        cursor: pointer !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        transform-origin: left center;
+     /* --- Vertical Tab Navigation Styling --- */
+
+/* 1. Reset: Hide default radio elements globally in the group */
+div[role="radiogroup"] > label > div:first-child { 
+    display: none !important; 
+}
+
+/* 2. Container Setup: Add spacing between navigation items */
+div[role="radiogroup"] { 
+    gap: 12px; 
+    margin-top: 100px;
+    margin-left: -30px;
+}
+
+/* 3. The Label Button (Static / Inactive State) 
+   We style the entire label container to look like a flat button. */
+div[role="radiogroup"] label {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    border-radius: 8px; /* Subtle rounded corner */
+    padding: 5px 20px;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: left center;
+}
+
+/* Inactive Text Styling: Match Montserrat and lighter gray from design */
+div[role="radiogroup"] label p { 
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 14px; /* Design uses larger font than previous step */
+    font-weight: 600; 
+    text-transform: uppercase; 
+    color: #888 !important; /* Lighter gray for inactive items */
+    margin: 0 !important;
+    padding-left: 15px;
+    border-left: 3px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    letter-spacing: 0.5px;
+}
+
+/* 4. Active State: Bigger, Darker, and the Accent Line 
+   This matches the interaction pattern from the previous request. */
+div[role="radiogroup"] label:has(input:checked) {
+        transform: scale(1);
+        transition: all 0.2s ease; 
     }
-    div[role="radiogroup"] label p { 
-        font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600; 
-        text-transform: uppercase; color: #888 !important; margin: 0 !important;
-        padding-left: 15px; border-left: 3px solid transparent;
-        transition: color 0.2s ease, border-color 0.2s ease; letter-spacing: 0.5px;
+
+    div[role="radiogroup"] label:has(input:checked) p {
+        color: #222 !important; 
+        font-size: 18px; 
+        border-left: 3px solid #000 !important; /* Forces the line to stay */
+        padding-left: 15px; 
     }
-    div[role="radiogroup"] label[data-checked="True"] {
-        background-color: rgba(0,0,0,0.03); box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        transform: scale(1.05); 
+
+    /* Optional: Slight hover state (only applies if NOT checked) */
+    div[role="radiogroup"] label:not(:has(input:checked)):hover p {
+        color: #333 !important;
+        border-left: 3px solid rgba(0,0,0,0.2) !important;
     }
-    div[role="radiogroup"] label[data-checked="True"] p {
-        color: #000 !important; font-size: 18px; border-left: 3px solid #000; padding-left: 15px; 
+
+/* --- LABELS FOR SELECTBOXES AND CHECKBOXES --- */
+    div[data-testid="stWidgetLabel"] p,
+    div[data-testid="stCheckbox"] label span {
+        font-family: 'Montserrat', sans-serif !important;
+        color: #44433E !important; /* Dark Gray */
+        font-weight: 600 !important;
+        font-size: 14px !important;
     }
-    div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
-        color: #333 !important; border-left: 3px solid rgba(0,0,0,0.2);
+
+    /* --- SELECTBOX TEXT (The selected option) --- */
+    div[data-baseweb="select"] span {
+        font-family: 'Inter', sans-serif !important;
+        color: #111827 !important; /* Deep black for input text */
+        font-size: 14px !important;
+        font-weight: 500 !important;
     }
+
+    /* --- SELECTBOX BACKGROUND & BORDER --- */
+    div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        border: 1px solid #D1D5DB !important;
+        border-radius: 8px !important;
+    }
+
 
     /* Custom White Metric Cards */
     .white-metric-card {
@@ -106,23 +167,35 @@ def render(df):
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
         div[role="radiogroup"] {
-            display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
-            overflow-x: auto; gap: 20px !important; margin-top: 20px !important;
-            margin-left: 0 !important; padding-bottom: 5px; border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; 
+            overflow-x: auto; gap: 20px !important; margin-top: 20px !important; margin-left: 0 !important;
+            padding-bottom: 5px; border-bottom: 1px solid rgba(0,0,0,0.05); 
+            margin-bottom: 20px !important; border-left: none !important;
         }
         div[role="radiogroup"]::-webkit-scrollbar { display: none; }
-        div[role="radiogroup"] label { padding: 0 !important; background-color: transparent !important; white-space: nowrap !important; }
+        div[role="radiogroup"] label {
+            border-left: none !important; padding: 0 !important; background-color: transparent !important; white-space: nowrap !important;
+        }
         div[role="radiogroup"] label p {
             font-size: 12px !important; letter-spacing: 1px; padding-left: 0 !important;
-            padding-bottom: 8px !important; border-left: none !important;
-            border-bottom: 3px solid transparent;
+            padding-bottom: 8px !important; border-left: none !important; border-bottom: 3px solid transparent; 
+            transition: all 0.2s ease;
         }
-        div[role="radiogroup"] label[data-checked="True" i] p { color: #000 !important; border-bottom: 3px solid #000 !important; }
-        div[role="radiogroup"] label[data-checked="True" i] { transform: scale(1) !important; box-shadow: none !important; }
-        .divider { display: none; }
+        /* Mobile Active Tab State (FIXED) */
+        div[role="radiogroup"] label:has(input:checked) p {
+            color: #000 !important; border-left: none !important; border-bottom: 3px solid #000 !important; 
+        }
+        div[role="radiogroup"] label:has(input:checked) {
+            transform: scale(1) !important; box-shadow: none !important;
+        }
+        div[role="radiogroup"] label:not(:has(input:checked)):hover p {
+            border-left: none !important;
+        }
+        .divider{display: none !important;}
     }
 
     div.stButton > button[kind="primary"] {
+    font-family: 'Montserrat', sans-serif;
     background-color: #FAFAFA !important;
     color: black !important;
     border: 2px solid #E7E7E7 !important;
@@ -156,7 +229,7 @@ def render(df):
         """, unsafe_allow_html=True)
         
         # --- 2. VISUALIZATION MODE LOGIC (Now styled as the side navigation) ---
-        v_modes = ["Total Workforce Density", "Underserved Hotspots (Out-of-Field)"]
+        v_modes = ["Total Workforce Density", "Underserved Hotspots"]
         v_idx = v_modes.index(st.session_state.get('geo_view_mode', v_modes[0]))
         view_mode = st.radio("Navigation", v_modes, index=v_idx, label_visibility="collapsed")
         st.session_state['geo_view_mode'] = view_mode
@@ -218,7 +291,6 @@ def render(df):
         st.markdown("<br><h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Dispatch Routing Algorithm</h3>", unsafe_allow_html=True)
         
         # --- 4. DISPATCH UI ---
-        st.markdown('<div style="margin-bottom: 0px;">', unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 1, 1])
         with col1:
             region_options = list(REGION_COORDS.keys())

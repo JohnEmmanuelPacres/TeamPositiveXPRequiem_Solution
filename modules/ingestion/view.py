@@ -16,30 +16,61 @@ def render():
     .stApp { background-color: #F1EFE9 !important; }
     
     /* --- Vertical Tab Navigation Styling --- */
-    div[role="radiogroup"] > label > div:first-child { display: none !important; }
-    div[role="radiogroup"] { gap: 12px; margin-top: 50px; margin-left: -30px; }
-    div[role="radiogroup"] label {
-        display: flex; align-items: center; background-color: transparent;
-        border-radius: 8px; padding: 5px 20px; margin: 0 !important;
-        cursor: pointer !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        transform-origin: left center;
+
+/* 1. Reset: Hide default radio elements globally in the group */
+div[role="radiogroup"] > label > div:first-child { 
+    display: none !important; 
+}
+
+/* 2. Container Setup: Add spacing between navigation items */
+div[role="radiogroup"] { 
+    gap: 12px; 
+    margin-top: 100px;
+    margin-left: -30px;
+}
+
+/* 3. The Label Button (Static / Inactive State) 
+   We style the entire label container to look like a flat button. */
+div[role="radiogroup"] label {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    border-radius: 8px; /* Subtle rounded corner */
+    padding: 5px 20px;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: left center;
+}
+
+/* Inactive Text Styling: Match Montserrat and lighter gray from design */
+div[role="radiogroup"] label p { 
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 14px; /* Design uses larger font than previous step */
+    font-weight: 600; 
+    text-transform: uppercase; 
+    color: #888 !important; /* Lighter gray for inactive items */
+    margin: 0 !important;
+    padding-left: 15px;
+    border-left: 3px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    letter-spacing: 0.5px;
+}
+
+/* 4. Active State: Bigger, Darker, and the Accent Line 
+   This matches the interaction pattern from the previous request. */
+div[role="radiogroup"] label:has(input:checked) {
+        transform: scale(1);
+        transition: all 0.2s ease; 
     }
-    div[role="radiogroup"] label p { 
-        font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700; 
-        text-transform: uppercase; color: #888 !important; margin: 0 !important;
-        padding-left: 15px; border-left: 3px solid transparent;
-        transition: color 0.2s ease, border-color 0.2s ease; letter-spacing: 0.5px;
+
+    div[role="radiogroup"] label:has(input:checked) p {
+        color: #222 !important; 
+        font-size: 18px; 
+        border-left: 3px solid #000 !important; /* Forces the line to stay */
+        padding-left: 15px; 
     }
-    div[role="radiogroup"] label[data-checked="True"] {
-        background-color: rgba(0,0,0,0.03); box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        transform: scale(1.05); 
-    }
-    div[role="radiogroup"] label[data-checked="True"] p {
-        color: #000 !important; font-size: 18px; border-left: 3px solid #000; padding-left: 15px; 
-    }
-    div[role="radiogroup"] label:hover:not([data-checked="True"]) p {
-        color: #333 !important; border-left: 3px solid rgba(0,0,0,0.2);
-    }
+
 
     /* Custom White Metric Cards */
     .white-metric-card {
@@ -92,25 +123,46 @@ def render():
     .hero-subtitle{ color: #666; font-family: 'Montserrat', sans-serif; font-size:18px; margin-bottom: 30px; }
 .divider { width: 1.5px; height: 100vh; background: rgba(224, 224, 224, 0.8); margin: 0 auto; display: block; margin-top: -100px; }
     /* Mobile Responsiveness */
+    /* Mobile Responsiveness */
     @media (max-width: 768px) {
         div[role="radiogroup"] {
-            display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
-            overflow-x: auto; gap: 20px !important; margin-top: 20px !important;
-            margin-left: 0 !important; padding-bottom: 5px; border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; 
+            overflow-x: auto; gap: 20px !important; margin-top: 20px !important; margin-left: 0 !important;
+            padding-bottom: 5px; border-bottom: 1px solid rgba(0,0,0,0.05); 
+            margin-bottom: 20px !important; border-left: none !important;
         }
         div[role="radiogroup"]::-webkit-scrollbar { display: none; }
-        div[role="radiogroup"] label { padding: 0 !important; background-color: transparent !important; white-space: nowrap !important; }
+        div[role="radiogroup"] label {
+            border-left: none !important; padding: 0 !important; background-color: transparent !important; white-space: nowrap !important;
+        }
         div[role="radiogroup"] label p {
             font-size: 12px !important; letter-spacing: 1px; padding-left: 0 !important;
-            padding-bottom: 8px !important; border-left: none !important;
-            border-bottom: 3px solid transparent;
+            padding-bottom: 8px !important; border-left: none !important; border-bottom: 3px solid transparent; 
+            transition: all 0.2s ease;
         }
-        div[role="radiogroup"] label[data-checked="True" i] p { color: #000 !important; border-bottom: 3px solid #000 !important; }
-        div[role="radiogroup"] label[data-checked="True" i] { transform: scale(1) !important; box-shadow: none !important; }
-        .divider {
-        display: none;
+        /* Mobile Active Tab State (FIXED) */
+        div[role="radiogroup"] label:has(input:checked) p {
+            color: #000 !important; border-left: none !important; border-bottom: 3px solid #000 !important; 
         }
-    }    
+        div[role="radiogroup"] label:has(input:checked) {
+            transform: scale(1) !important; box-shadow: none !important;
+        }
+        div[role="radiogroup"] label:not(:has(input:checked)):hover p {
+            border-left: none !important;
+        }
+        .divider{display: none !important;}
+    }
+    /* 1. The Main Label (Upload Regional Dataset...) */
+[data-testid="stFileUploader"] label p {
+    font-family: 'Montserrat', sans-serif !important;
+    color: #44433E !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
     
     </style>
     """, unsafe_allow_html=True)
@@ -120,7 +172,7 @@ def render():
 
     with left_col:
         st.markdown("""
-            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: -100px;">
+            <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px; margin-top: -100px;">
                 Ingestion<br>Engine
             </h1>
             <p class="hero-subtitle" style="font-size:1.5rem;">
@@ -148,6 +200,7 @@ def render():
             """, unsafe_allow_html=True)
             st.balloons()
             st.session_state['integration_success'] = False
+        st.markdown("<br>", unsafe_allow_html=True)
 
         if v_mode == "Pipeline Console":
             st.markdown("""

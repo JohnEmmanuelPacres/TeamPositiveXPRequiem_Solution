@@ -58,11 +58,39 @@ def render(df):
         div[role="radiogroup"] label[data-checked="True" i] { transform: scale(1) !important; box-shadow: none !important; }
         .divider { display: none; }
     }
+/* --- SELECTBOX LABEL ("Filter Topology by Region:") --- */
+    div[data-testid="stWidgetLabel"] p {
+        font-family: 'Montserrat', sans-serif !important;
+        color: #44433E !important; /* Dark Gray */
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+
+    /* --- SELECTBOX TEXT (e.g., "All Regions") --- */
+    div[data-baseweb="select"] span {
+        font-family: 'Inter', sans-serif !important;
+        color: #111827 !important; /* Deep black for input text */
+        font-size: 14px !important;
+        font-weight: 500 !important;
+    }
+
+    /* --- SELECTBOX BACKGROUND & BORDER --- */
+    div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        border: 1px solid #D1D5DB !important;
+        border-radius: 8px !important;
+    }
 
     /* Custom White Cards for Graph and UI */
     .white-metric-card {
          background-color: rgb(255, 255, 255, 0.7); padding: 20px; border-radius: 12px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02); height: 100%;
+        box-shadow: 
+            0 8px 20px rgba(0, 0, 0, 0.04), 
+            0 0 15px rgba(255, 255, 255, 0.7); 
+        border: 1px solid rgba(255, 255, 255, 1); 
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
     .wm-label { color: #6B7280; font-size: 13px; font-family: 'Montserrat', sans-serif; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;}
     .wm-value { color: #10B981; font-size: 24px; font-weight: 700; }
@@ -110,11 +138,14 @@ def render(df):
     }
 }
 div.stButton > button[kind="primary"] {
-    background-color:rgba(0, 0, 0, 0.5); !important;
-    color: white !important;
-    border: none !important;
+    background-color:#F3F3F3 !important;
+    color: #44433E !important;
+    border: 1px solid #D1D5DB !important;
     border-radius: 8px !important;
 
+}
+div.stButton > button[kind="secondary"] {
+    margin-bottom: 50px;
 }
     </style>
     """, unsafe_allow_html=True)
@@ -129,7 +160,7 @@ div.stButton > button[kind="primary"] {
         Interactive mapping of localized<br>teaching resources.
     </p>""", unsafe_allow_html=True)
         
-        st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Intervention Engine</h3>", unsafe_allow_html=True)
+        st.markdown("<h5 style='color: #44433E; font-family: Montserrat, sans-serif;'>Intervention Engine</h5>", unsafe_allow_html=True)
         st.markdown("""
             <div class="astra-alert-info">
                 Simulate re-assigning a teacher to fix regional fragility bottlenecks dynamically.
@@ -181,13 +212,14 @@ div.stButton > button[kind="primary"] {
                     st.success(f"Successfully deployed {teacher_id} to {new_region}. Metrics recalculated.")
                     st.rerun()
 
-                if st.button("Reset Deployment Simulation", use_container_width=True):
+                if st.button("Reset Deployment Simulation", type="secondary", use_container_width=True):
                     from core.data_loader import get_working_dataframe
                     active_year = st.session_state.get('active_year', '2026')
                     st.session_state['working_df'] = get_working_dataframe(active_year)
                     st.session_state['regional_alerts'] = [] 
                     st.success("Simulation reset. Teachers returned to original regions.")
                     st.rerun()
+        st.markdown("<br>", unsafe_allow_html=True)
 
     with div_col:
         # This renders your CSS divider
@@ -201,8 +233,16 @@ div.stButton > button[kind="primary"] {
             control_col, info_col = st.columns([1, 1])
             with control_col:
                 target_region = st.selectbox("Filter Topology by Region:", ["All Regions"] + list(REGION_COORDS.keys()))
+
             with info_col:
-                st.markdown("<div style='font-size: 0.85rem; color: #666; padding-top: 5px;'><strong>Navigation:</strong><br>• Scroll to zoom in/out<br>• Click & drag to pan/move nodes</div>", unsafe_allow_html=True)
+                st.markdown("""
+                    <div style='font-size: 0.85rem; color: #666; padding-top: 5px; font-family: "Inter", sans-serif; line-height: 1.6;'>
+                        <strong style='font-family: "Montserrat", sans-serif; color: #44433E; font-size: 0.9rem;'>Navigation:</strong><br>
+                        • Scroll to zoom in/out<br>
+                        • Click & drag to pan/move nodes
+                    </div>
+                """, unsafe_allow_html=True)
+
 
             if target_region == "All Regions":
                 st.markdown("""
@@ -231,15 +271,15 @@ div.stButton > button[kind="primary"] {
             <div class='white-metric-card' style='display: flex; justify-content: space-around; flex-wrap: wrap; padding: 15px;'>
                 <div>
                     <div class='wm-label'>Node Shapes</div>
-                    <div style='font-size: 13px; color: #444;'>⭐ Local Legend (15+ Yrs)<br>🔵 Standard Node<br>🔴 Region Hub</div>
+                    <div style='font-size: 13px; color: #444;font-family: 'Montserrat', sans-serif;'>⭐ Local Legend (15+ Yrs)<br>🔵 Standard Node<br>🔴 Region Hub</div>
                 </div>
                 <div>
                     <div class='wm-label'>Subject Colors (A-M)</div>
-                    <div style='font-size: 13px; color: #444;'>🟦 Physics<br>🟩 Chemistry<br>🟧 Biology</div>
+                    <div style='font-size: 13px; color: #444;font-family: 'Montserrat', sans-serif;'>🟦 Physics<br>🟩 Chemistry<br>🟧 Biology</div>
                 </div>
                 <div>
                     <div class='wm-label'>Subject Colors (N-Z)</div>
-                    <div style='font-size: 13px; color: #444;'>🟪 Math<br>⬜ Gen Sci<br>⚪ Other</div>
+                    <div style='font-size: 13px; color: #444;font-family: 'Montserrat', sans-serif;'>🟪 Math<br>⬜ Gen Sci<br>⚪ Other</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -262,9 +302,14 @@ def render_teacher_view(df):
         border-left: 3px solid #111; padding-left: 18px; 
     }
     .white-metric-card {
-        background-color: #FFFFFF; padding: 20px; border-radius: 12px;
+         background-color: rgb(255, 255, 255, 0.7); padding: 20px; border-radius: 12px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02); height: 100%;
-        margin-bottom: 20px;
+        box-shadow: 
+            0 8px 20px rgba(0, 0, 0, 0.04), 
+            0 0 15px rgba(255, 255, 255, 0.7); 
+        border: 1px solid rgba(255, 255, 255, 1); 
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
     .wm-label { color: #6B7280; font-size: 13px; font-family: 'Montserrat', sans-serif; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;}
     .wm-value { font-size: 28px; font-weight: 700; }
@@ -295,7 +340,32 @@ def render_teacher_view(df):
     .divider {
         display: none;
     }
+    .white-metric-card {
+        margin-bottom: 80px;
+    }
 }
+div[data-testid="stWidgetLabel"] p {
+        font-family: 'Montserrat', sans-serif !important;
+        color: #44433E !important; /* Dark Gray */
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        margin-bottom: 100px;
+    }
+
+    /* --- SELECTBOX TEXT (e.g., "All Regions") --- */
+    div[data-baseweb="select"] span {
+        font-family: 'Inter', sans-serif !important;
+        color: #111827 !important; /* Deep black for input text */
+        font-size: 14px !important;
+        font-weight: 500 !important;
+    }
+
+    /* --- SELECTBOX BACKGROUND & BORDER --- */
+    div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        border: 1px solid #D1D5DB !important;
+        border-radius: 8px !important;
+    }
     .graph-wrapper { background-color: #FFFFFF; border-radius: 12px; padding: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02); margin-bottom: 20px; }
     </style>
     """, unsafe_allow_html=True)
@@ -311,6 +381,7 @@ def render_teacher_view(df):
         
         st.markdown("<div style='margin-top: 30px;' class='wm-label'>Operating Region</div>", unsafe_allow_html=True)
         teacher_region = st.selectbox("Your Operating Region:", list(REGION_COORDS.keys()), label_visibility="collapsed")
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
     with div_col:
         # This renders your CSS divider
@@ -332,16 +403,16 @@ def render_teacher_view(df):
         # Display localized metrics
         mc1, mc2 = st.columns(2)
         mc1.markdown(f"""
-        <div class="white-metric-card" style="border-left: 4px solid #10B981; margin-top: -50px;">
+        <div class="white-metric-card" style="margin-top: -50px;">
             <div class="wm-label">Available Local Legends</div>
-            <div class="wm-value" style="color: #10B981;">{veteran_count}</div>
+            <div class="wm-value" style="color: #10B981; font-size: 40px;">{veteran_count}</div>
         </div>
         """, unsafe_allow_html=True)
-
+        st.markdown("<br>", unsafe_allow_html=True)
         mc2.markdown(f"""
-        <div class="white-metric-card" style="border-left: 4px solid #3B82F6; margin-top: -50px;">
+        <div class="white-metric-card" style="margin-top: -50px;">
             <div class="wm-label">Standard Peers</div>
-            <div class="wm-value" style="color: #3B82F6;">{standard_count}</div>
+            <div class="wm-value" style="color: #3B82F6; font-size: 40px;">{standard_count}</div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -360,15 +431,15 @@ def render_teacher_view(df):
         <div class='white-metric-card' style='display: flex; justify-content: space-around; flex-wrap: wrap; padding: 15px;'>
             <div>
                 <div class='wm-label'>Node Shapes</div>
-                <div style='font-size: 13px; color: #444;'>⭐ Local Legend (15+ Yrs)<br>🔵 Standard Node<br>🔴 Region Hub</div>
+                <div style='font-size: 13px; color: #444; font-family: 'Montserrat', sans-serif;'>⭐ Local Legend (15+ Yrs)<br>🔵 Standard Node<br>🔴 Region Hub</div>
             </div>
             <div>
                 <div class='wm-label'>Subject Colors (A-M)</div>
-                <div style='font-size: 13px; color: #444;'>🟦 Physics<br>🟩 Chemistry<br>🟧 Biology</div>
+                <div style='font-size: 13px; color: #444; font-family: 'Montserrat', sans-serif;'>🟦 Physics<br>🟩 Chemistry<br>🟧 Biology</div>
             </div>
             <div>
                 <div class='wm-label'>Subject Colors (N-Z)</div>
-                <div style='font-size: 13px; color: #444;'>🟪 Math<br>⬜ Gen Sci<br>⚪ Other</div>
+                <div style='font-size: 13px; color: #444; font-family: 'Montserrat', sans-serif;'>🟪 Math<br>⬜ Gen Sci<br>⚪ Other</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
