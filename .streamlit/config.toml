@@ -1,19 +1,10 @@
 [theme]
-# You can change the base between "light" and "dark" mode.
-base = "light"
+# Force the app to always use light mode
+base="light"
 
-# You can also customize specific colors if you want to override the base theme.
-# Uncomment the following lines to define a custom color palette:
-
-# primaryColor = "#1E3A8A"
-# backgroundColor = "#ffffff"
-# secondaryBackgroundColor = "#f0f2f6"
-# textColor = "#262730"
-# font = "sans serif"
-
-# --- Example Dark Mode Configuration ---
-# base = "dark"
-# primaryColor = "#F3F4F6"
-# backgroundColor = "#0e1117"
-# secondaryBackgroundColor = "#262730"
-# textColor = "#fafafa"
+# ASTRA design system colors
+primaryColor="#D9D9D9"         # The green accent color you use
+backgroundColor="#f9f9f9ff"      # Your exact Light Beige background
+secondaryBackgroundColor="#F3F3F3" # White for sidebars/metrics
+textColor="#222"            # Your exact Dark Gray text color
+font="sans serif"
