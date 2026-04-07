@@ -799,7 +799,7 @@ div[role="radiogroup"] label:has(input:checked) {
             font-size: 14px; margin-bottom: 20px;
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 0 0 35px rgba(59, 130, 246, 0.15);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            margin-top: -50px;
+            margin-top: 10px;
         }
         .astra-alert-info strong { font-weight: 800; color: #1e40af; letter-spacing: 0.5px; }
 
@@ -1010,3 +1010,166 @@ div[role="radiogroup"] label:has(input:checked) {
                         <strong>NO DIRECT MATCHES:</strong> No high-experience mentors currently available in your node criteria. Try expanding your search to adjacent regions.
                     </div>
                     """, unsafe_allow_html=True)
+                    
+            # ======== NEW CAREER PROGRESS TRACKER FEATURE ======== 
+            st.markdown("<hr style='margin: 40px 0;'>", unsafe_allow_html=True)
+            st.markdown("<h3 style='color: #44433E; font-family: Montserrat, sans-serif;'>Career Progression Tracker</h3>", unsafe_allow_html=True)
+            
+            # Formulate progress based on the current_xp input variable
+            if current_xp < 3:
+                current_tier = "Novice Pool"
+                next_tier = "Core Tier"
+                progress = int((current_xp / 3) * 100)
+                xp_needed = 3 - current_xp
+                color = "#F43F5E" # Faded Red theme
+            elif current_xp < 12:
+                current_tier = "Core Tier"
+                next_tier = "Veteran Legend"
+                progress = int(((current_xp - 3) / 9) * 100)
+                xp_needed = 12 - current_xp
+                color = "#3B82F6" # Faded Blue theme
+            else:
+                current_tier = "Veteran Legend"
+                next_tier = "Max Level Reached"
+                progress = 100
+                xp_needed = 0
+                color = "#10B981" # Green theme
+            
+            st.markdown(f"**Current Status:** <span class='wm-pill' style='background-color: {color}20; color: {color}; font-size: 14px;'>{current_tier}</span> (Level {int(current_xp)})", unsafe_allow_html=True)
+            st.progress(progress)
+            
+            if next_tier != "Max Level Reached":
+                st.info(f"You represent a structural capacity node. It takes **{xp_needed}** more years of specialized experience to unlock the **{next_tier}** milestone.")
+            else:
+                st.success("You are recognized as a Veteran Legend! Your focus should now shift heavily towards local mentorship to reduce program fragility.")
+            
+            st.markdown(f"""
+            <div class="white-metric-card" style="margin-top: 20px; border-left: 4px solid {color}; padding: 15px;">
+                <h4 style="font-family: Montserrat, sans-serif; margin: 0; color: #44433E;">Skill-Tree Roadmap</h4>
+                <ul style="list-style-type: none; padding-left: 0; font-family: Inter, sans-serif; color: #555; margin-top: 15px;">
+                    <li style="margin: 10px 0; opacity: {1.0 if current_xp >= 0 else 0.5};">
+                        {'✅' if current_xp >= 3 else '🟢'} <strong>Phase 1 (Years 0-3):</strong> Build resilience, expand pedagogy, and heavily rely on a Local Legend mentor.
+                    </li>
+                    <li style="margin: 10px 0; opacity: {1.0 if current_xp >= 3 else 0.5};">
+                        {'✅' if current_xp >= 12 else ('🟢' if current_xp >= 3 else '⚪')} <strong>Phase 2 (Years 4-11):</strong> Deepen subject alignment mastery and execute institutional leadership roles.
+                    </li>
+                    <li style="margin: 10px 0; opacity: {1.0 if current_xp >= 12 else 0.5};">
+                        {'🟢' if current_xp >= 12 else '⚪'} <strong>Phase 3 (Years 12+):</strong> Formally recognized as a Local Legend. Active mentorship burdens transfer to you.
+                    </li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+
+def render_certification_tracker(df):
+    st.markdown("""
+    <style>
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@400;500&display=swap");
+
+    .stApp { background-color: #F1EFE9 !important; }
+
+    .white-metric-card {
+        background-color: rgb(255, 255, 255, 0.7); padding: 20px; border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02); display: flex; flex-direction: column;
+        justify-content: space-between; height: 100%;
+    }
+    
+    .stSelectbox label, .stNumberInput label { font-family: 'Montserrat', sans-serif !important; color: #44433E !important; font-weight: 600 !important; }
+    
+    .hero-subtitle{ color: #666; font-family: 'Montserrat', sans-serif; font-size:18px; margin-bottom: 50px; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- Title Section ---
+    st.markdown("""
+        <h1 style="color: #44433E; font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 10px;">
+            Certification<br>Progress Tracker
+        </h1>
+        <p class="hero-subtitle" style="font-size:1.5rem;">
+            Set a certification goal and track your progression requirements towards your next promotion.
+        </p>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<hr style='margin: 40px 0;'>", unsafe_allow_html=True)
+    
+    left_col, div_col, right_col = st.columns([1, 0.1, 2], gap="medium")
+    
+    with left_col:
+        st.markdown("<h4 style='color: #44433E; font-family: Montserrat, sans-serif; font-size: 1.2rem;'>Your Current Metrics</h4>", unsafe_allow_html=True)
+        # Inputs to reflect current state
+        current_xp = st.number_input("Your Current XP (Years)", min_value=0, max_value=40, value=2)
+        cur_tr = st.number_input("Completed Training Hours", min_value=0, value=0, max_value=200)
+
+    with div_col:
+        st.markdown('<div style="width: 1.5px; height: 100%; background: rgba(224, 224, 224, 0.8); margin: 0 auto; display: block;"></div>', unsafe_allow_html=True)
+        
+    with right_col:
+        st.markdown("<h4 style='color: #44433E; font-family: Montserrat, sans-serif; font-size: 1.2rem;'>Target Progression</h4>", unsafe_allow_html=True)
+        
+        # Select target certification (Aligned with DepEd / Local Standards)
+        target_cert = st.selectbox("Select Target Certification / Promotion", [
+            "Teacher I", "Teacher II", "Teacher III", "Teacher IV", "Teacher V", "Teacher VI", "Teacher VII",
+            "Master Teacher I", "Master Teacher II", "Master Teacher III", "Master Teacher IV", "Master Teacher V",
+            "Head Teacher I", "Head Teacher II", "Head Teacher III", "Head Teacher IV", "Head Teacher V", "Head Teacher VI"
+        ], key="target_cert")
+        
+        # Define certification requirements based on realistic public school promotion guidelines
+        cert_reqs = {
+            "Teacher I": {"xp": 0, "training_hrs": 0, "performance_grade": "Satisfactory"},
+            "Teacher II": {"xp": 3, "training_hrs": 0, "performance_grade": "Very Satisfactory"},
+            "Teacher III": {"xp": 5, "training_hrs": 18, "performance_grade": "Very Satisfactory"},
+            "Teacher IV": {"xp": 6, "training_hrs": 24, "performance_grade": "Very Satisfactory"},
+            "Teacher V": {"xp": 7, "training_hrs": 30, "performance_grade": "Very Satisfactory"},
+            "Teacher VI": {"xp": 8, "training_hrs": 36, "performance_grade": "Very Satisfactory"},
+            "Teacher VII": {"xp": 9, "training_hrs": 42, "performance_grade": "Very Satisfactory"},
+            "Master Teacher I": {"xp": 8, "training_hrs": 40, "performance_grade": "Very Satisfactory"},
+            "Master Teacher II": {"xp": 10, "training_hrs": 48, "performance_grade": "Very Satisfactory + Research"},
+            "Master Teacher III": {"xp": 12, "training_hrs": 56, "performance_grade": "Outstanding"},
+            "Master Teacher IV": {"xp": 14, "training_hrs": 64, "performance_grade": "Outstanding + Publication"},
+            "Master Teacher V": {"xp": 16, "training_hrs": 72, "performance_grade": "Outstanding + Innovation"},
+            "Head Teacher I": {"xp": 12, "training_hrs": 24, "performance_grade": "Very Satisfactory (Leadership)"},
+            "Head Teacher II": {"xp": 13, "training_hrs": 32, "performance_grade": "Very Satisfactory (Leadership)"},
+            "Head Teacher III": {"xp": 14, "training_hrs": 40, "performance_grade": "Very Satisfactory (Leadership)"},
+            "Head Teacher IV": {"xp": 15, "training_hrs": 48, "performance_grade": "Outstanding (Leadership)"},
+            "Head Teacher V": {"xp": 16, "training_hrs": 56, "performance_grade": "Outstanding + Dev"},
+            "Head Teacher VI": {"xp": 17, "training_hrs": 64, "performance_grade": "Outstanding + Portfolio"}
+        }
+        
+        req_xp = cert_reqs[target_cert]["xp"]
+        req_tr = cert_reqs[target_cert]["training_hrs"]
+
+        # Progress calculation
+        xp_progress = min(100, int((current_xp / req_xp) * 100)) if req_xp > 0 else 100
+        tr_progress = min(100, int((cur_tr / req_tr) * 100)) if req_tr > 0 else 100
+        overall_progress = (xp_progress + tr_progress) // 2
+        
+        st.markdown(f"**Overall Progress to {target_cert}:**")
+        st.progress(overall_progress)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        req_cols = st.columns(3)
+        with req_cols[0]:
+            xp_status = "✅ Completed" if current_xp >= req_xp else f"❌ {int(req_xp - current_xp)} yrs missing"
+            st.markdown(f'''
+            <div class="white-metric-card" style="padding: 15px; border-top: 3px solid {'#10B981' if current_xp >= req_xp else '#F43F5E'};">
+                <p style="margin: 0; font-size: 14px; font-weight: 600;">Experience Req.</p>
+                <h3 style="margin: 5px 0 0 0; color: #333;">{req_xp} Yrs</h3>
+                <p style="margin: 0; font-size: 12px; color: {'#10B981' if current_xp >= req_xp else '#F43F5E'};">{xp_status}</p>
+            </div>
+            ''', unsafe_allow_html=True)
+        with req_cols[1]:
+            tr_status = "✅ Completed" if cur_tr >= req_tr else f"❌ {int(req_tr - cur_tr)} hrs missing"
+            st.markdown(f'''
+            <div class="white-metric-card" style="padding: 15px; border-top: 3px solid {'#10B981' if cur_tr >= req_tr else '#F43F5E'};">
+                <p style="margin: 0; font-size: 14px; font-weight: 600;">Training Req.</p>
+                <h3 style="margin: 5px 0 0 0; color: #333;">{req_tr} Hrs</h3>
+                <p style="margin: 0; font-size: 12px; color: {'#10B981' if cur_tr >= req_tr else '#F43F5E'};">{tr_status}</p>
+            </div>
+            ''', unsafe_allow_html=True)
+        with req_cols[2]:
+            st.markdown(f'''
+            <div class="white-metric-card" style="padding: 15px; border-top: 3px solid #3B82F6;">
+                <p style="margin: 0; font-size: 14px; font-weight: 600;">Min Rating</p>
+                <h5 style="margin: 5px 0 0 0; color: #333;">{cert_reqs[target_cert]['performance_grade']}</h5>
+                <p style="margin: 0; font-size: 12px; color: #666;">Evaluation Rating</p>
+            </div>
+            ''', unsafe_allow_html=True)

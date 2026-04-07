@@ -2,7 +2,7 @@
 # Force the app to always use light mode
 base="light"
 
-# Your specific ASTRA design system colors
+# ASTRA design system colors
 primaryColor="#D9D9D9"         # The green accent color you use
 backgroundColor="#f9f9f9ff"      # Your exact Light Beige background
 secondaryBackgroundColor="#F3F3F3" # White for sidebars/metrics
