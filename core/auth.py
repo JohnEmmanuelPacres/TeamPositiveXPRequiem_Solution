@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import os
 
+from core.ui_components import inject_astra_theme
+
 def initialize_session():
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
@@ -26,9 +28,13 @@ def render_sidebar_auth():
         st.rerun()
 
 def render_login_page():
+    inject_astra_theme() 
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<div style='text-align: center; font-size: 2.5em; font-weight: bold; margin-bottom: 0.5em;'>A.S.T.R.A</div>", unsafe_allow_html=True)
-    st.markdown("<div style='text-align: center; color: #888888; font-size: 1.25em; font-weight: bold;'>AI-driven Spatial Tracking and Resource Allocation System</div>", unsafe_allow_html=True)
+    st.markdown('<div class="astra-title">ASTRA</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="astra-subtitle">AI-DRIVEN SPATIAL TRACKING AND RESOURCE ALLOCATION SYSTEM</div>',
+        unsafe_allow_html=True
+    )
     st.markdown("<br>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])

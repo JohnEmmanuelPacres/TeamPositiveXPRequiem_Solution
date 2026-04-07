@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/lucide-static@0.344.0/font/lucide.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Inter:wght@400;500&display=swap");
+
+      body {
+        background: transparent;
+      }
+
+      .top-nav-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        width: 100%;
+        max-width: 1800px;
+        margin: 0 auto;
+        padding: 0 20px;
+        box-sizing: border-box;
+        pointer-events: auto;
+      }
+
+      .burger-icon {
+        display: none !important;
+      }
+
+      .nav-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.98);
+        padding: 4px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        flex: 1;
+        min-width: 0;
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .nav-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-item,
+      .nav-item-active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 5px 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-height: 45px;
+        flex: 1 0 auto;
+        min-width: 0;
+        opacity: 0.8;
+      }
+      .nav-item-active {
+        background: #f1f1f1;
+        border-radius: 10px;
+        opacity: 1;
+      }
+      .nav-item:hover {
+        background: #fafafa;
+        border-radius: 10px;
+        opacity: 1;
+      }
+
+      .nav-icon i {
+        font-size: 18px;
+        color: #333;
+        display: flex;
+        align-items: center;
+      }
+      .nav-text-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .nav-label {
+        font-family: "Montserrat", sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: #333;
+        text-transform: uppercase;
+        white-space: nowrap;
+        line-height: 1.2;
+        text-align: center;
+      }
+      .nav-sublabel {
+        font-family: "Montserrat", sans-serif;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: #333;
+        text-transform: uppercase;
+        margin-top: 1px;
+        line-height: 1;
+        text-align: center;
+      }
+      .nav-divider {
+        width: 1.5px;
+        height: 25px;
+        background: #e0e0e0;
+        margin: 0 5px;
+        flex-shrink: 0;
+      }
+
+      /* Account Bubble */
+      #menu-toggle,
+      #account-toggle {
+        display: none;
+      }
+      .account-wrapper {
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .account-trigger {
+        width: 46px;
+        height: 46px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+      .account-trigger i {
+        font-size: 20px;
+        color: #333;
+      }
+
+      .account-dropdown {
+        position: absolute;
+        top: 55px;
+        right: 0;
+        width: 180px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        display: none;
+        padding: 8px 0;
+        z-index: 10000;
+      }
+      #account-toggle:checked ~ .account-dropdown {
+        display: block;
+      }
+      .dropdown-header {
+        font-family: "Montserrat", sans-serif;
+        padding: 10px 16px;
+        font-size: 10px;
+        color: #999;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+      .dropdown-user-info {
+        font-family: "Montserrat", sans-serif;
+        padding: 5px 16px 12px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .logout-btn {
+        font-family: "Montserrat", sans-serif;
+        margin-top: 5px;
+        padding: 12px 16px;
+        font-size: 15px;
+        color: #ff4b4b;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.2s;
+      }
+      .logout-btn:hover {
+        background: #fff5f5;
+      }
+
+      /* =========================================
+         TIMELINE STYLING (Desktop & Mobile)
+         ========================================= */
+      .mobile-timeline-wrapper {
+        display: none;
+      }
+
+      .secondary-nav-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        max-width: 1800px;
+        margin: 15px auto 0 auto;
+        padding: 0 20px;
+        box-sizing: border-box;
+        pointer-events: none;
+      }
+
+      .desktop-timeline {
+        pointer-events: auto;
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 8px 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        outline: none;
+        cursor: pointer;
+      }
+
+      /* MOBILE RESPONSE */
+      @media (max-width: 768px) {
+        .nav-text-wrapper {
+          display: none;
+        }
+        .nav-item,
+        .nav-item-active {
+          flex: none;
+          width: 60px;
+        }
+      }
+
+      @media (max-width: 850px) {
+        .top-nav-wrapper {
+          justify-content: space-between;
+          padding: 0 15px;
+          width: 100%;
+        }
+
+        .burger-icon {
+          display: flex !important;
+          width: 46px;
+          height: 46px;
+          background: white;
+          border-radius: 12px;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+          border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        .burger-icon i {
+          font-size: 20px;
+          color: #333;
+        }
+
+        .nav-container {
+          display: none;
+          position: absolute;
+          top: 65px;
+          left: 15px;
+          width: 320px;
+          flex-direction: column !important;
+          background: white;
+          padding: 12px;
+          border-radius: 16px;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        #menu-toggle:checked ~ .nav-container {
+          display: flex !important;
+        }
+        .nav-item,
+        .nav-item-active {
+          flex-direction: row !important;
+          justify-content: flex-start !important;
+          padding: 16px 20px !important;
+          gap: 20px !important;
+          width: 100%;
+          border-bottom: 1px solid #f8f8f8;
+          flex: none;
+        }
+        .nav-text-wrapper {
+          display: flex !important;
+          align-items: flex-start !important;
+          text-align: left !important;
+        }
+        .nav-divider {
+          display: none;
+        }
+
+        /* Mobile Timeline Display */
+        .secondary-nav-wrapper {
+          display: none;
+        }
+        .mobile-timeline-wrapper {
+          display: block;
+          width: 100%;
+          padding: 5px 0 10px 0;
+        }
+        .nav-divider-horizontal {
+          width: 100%;
+          height: 1px;
+          background: #f0f0f0;
+          margin: 10px 0;
+        }
+        .timeline-select {
+          width: calc(100% - 40px);
+          margin: 5px 20px;
+          padding: 10px;
+          border-radius: 8px;
+          border: 1px solid #e0e0e0;
+          font-family: "Montserrat", sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          background-color: #f9f9f9;
+          outline: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script>
+      function sendDataToPython(value) {
+        window.parent.postMessage(
+          {
+            isStreamlitMessage: true,
+            type: "streamlit:setComponentValue",
+            value: value,
+          },
+          "*",
+        );
+      }
+
+      window.addEventListener("message", function (event) {
+        if (event.data.type === "streamlit:render") {
+          const args = event.data.args;
+          document.getElementById("root").innerHTML = args.html;
+
+          // Standard Nav Item Listeners
+          const navItems = document.querySelectorAll("[data-nav]");
+          navItems.forEach((item) => {
+            item.addEventListener("click", function () {
+              sendDataToPython(this.getAttribute("data-nav"));
+            });
+          });
+
+          // Timeline Select Listeners
+          const timelineSelects = document.querySelectorAll("[data-timeline]");
+          timelineSelects.forEach((select) => {
+            select.addEventListener("change", function () {
+              sendDataToPython("TIMELINE_" + this.value);
+            });
+          });
+
+          // THIS MUST BE 350 so Streamlit doesn't cut the dropdown in half!
+          window.parent.postMessage(
+            {
+              isStreamlitMessage: true,
+              type: "streamlit:setFrameHeight",
+              height: 210, //600
+            },
+            "*",
+          );
+        }
+      });
+
+      window.parent.postMessage(
+        {
+          isStreamlitMessage: true,
+          type: "streamlit:componentReady",
+          apiVersion: 1,
+        },
+        "*",
+      );
+    </script>
+  </body>
+</html>
