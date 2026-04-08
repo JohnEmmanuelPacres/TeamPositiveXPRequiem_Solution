@@ -1105,7 +1105,7 @@ def render_certification_tracker(df):
     with right_col:
         st.markdown("<h4 style='color: #44433E; font-family: Montserrat, sans-serif; font-size: 1.2rem;'>Target Progression</h4>", unsafe_allow_html=True)
         
-        # Select target certification (Aligned with DepEd / Local Standards)
+        # Select target certification (Aligned with PH teacher Local Standards)
         target_cert = st.selectbox("Select Target Certification / Promotion", [
             "Teacher I", "Teacher II", "Teacher III", "Teacher IV", "Teacher V", "Teacher VI", "Teacher VII",
             "Master Teacher I", "Master Teacher II", "Master Teacher III", "Master Teacher IV", "Master Teacher V",
