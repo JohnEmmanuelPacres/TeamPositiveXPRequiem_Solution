@@ -4,7 +4,7 @@ import base64
 
 def set_page_config():
     st.set_page_config(
-        page_title="DSS Platform - Requiem",
+        page_title="ASTRA : AI-driven Spatial Tracking and Resource Allocation",
         page_icon="⭐️",
         layout="wide",
         initial_sidebar_state="expanded"
