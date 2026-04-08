@@ -34,7 +34,7 @@ By unifying fragmented data, the **A.S.T.R.A** framework acts as a mathematical 
 
 - **Longitudinal Timeframe Simulator (2022-2026):** Algorithmically reverse-engineers historical datasets using dynamic XP penalties to simulate programmatic ROI and Year-Over-Year (YoY) recovery metrics.
 - **Prescriptive Intelligence (AI Clustering):** Uses `scikit-learn` K-Means clustering to segment the workforce into dynamic capability cohorts ("Novice Pool", "Core Tier", "Veteran Legends").
-- **Gamified Teacher UX (Role-Based Access):** Features an engaging RPG-inspired interface for end-users, visualizing capabilities via Plotly "Skill-Tree" Radar Charts and dynamically matching them with "Local Legends" for mentorship.
+- **Gamified Teacher UX (Role-Based Access):** Features an engaging RPG-inspired interface for end-users, visualizing capabilities via Plotly "Skill-Tree" Radar Charts, tracking algorithmic **Certification Progress**, and dynamically matching them with "Local Legends" for mentorship.
 - **Geospatial Macro-Routing:** A Project NOAH-style 3D logistics map powered by `pydeck` that calculates supply-and-demand to route mentors from robust regional hubs inward to underserved epicenters.
 - **Obsidian Mentorship Graph:** Interactive node topology displaying mentor-mentee connectivity via `NetworkX` and `pyvis`.
 
@@ -69,6 +69,12 @@ The system operates as a **Modular Monolith** built entirely in Python via Strea
    - Acts as the macro-admin surveillance suite.
    - Runs deterministic real-time heuristics predicting local "Fragility Scores".
    - Computes dynamic classification cohorts and projects an embedded 5-Year timeline simulation across high-density WebGL scatter layers.
+
+### Supporting Infrastructure
+
+- **Core System (`core/`)**: Houses foundational application logic, including the Security Gateway (`auth.py`), optimized dataframe schemas and data loaders (`data_loader.py`), and localized UI renderers (`ui_components.py`).
+- **Custom Frontend Assets (`lib/` & `navbar_component/`)**: Contains offline distributions of JS libraries (`vis-network`, `tom-select`) and completely custom HTML/JS Streamlit components (like our top navigation bar) necessary for the advanced UI integrations.
+- **Data Repository (`Dataset/`)**: A dedicated environment containing the historical, simulated `STAR_Integrated_Data` CSV sets, enabling isolated data wrangling before it is piped into the main A.S.T.R.A UI.
 
 ## Recent Updates & Optimizations
 
@@ -121,6 +127,7 @@ To demo the comprehensive capability of the A.S.T.R.A framework to the judges, f
 2. Emphasize how the global UI instantly collapses down into specific, private metrics.
 3. Navigate to **Career Skill-Tree (Analytics)**. Show the RPG-styled Plotly Radar Chart visually summarizing the logged-in teacher's exact capabilities against their regional mathematical cohort averages.
 4. Switch to **Local Ecosystem (Network)**. Demonstrate the PyVis graph rendering an isolated topological web, showing exactly who the individual teacher's localized "Veteran Legends" and mentees are strictly within their immediate jurisdiction.
+5. Switch to **Certification Progress Tracker**. Walk through testing progression mechanics; set a target goal (e.g., _Head Teacher II_ or _Master Teacher V_) and dynamically calculate the required experience, training hours, and performance evaluation gaps.
 
 ## Methodology & Mathematical Formalization
 
